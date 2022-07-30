@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import PropTypes from "prop-types";
 import { Col, Input, Menu, Row } from "antd";
@@ -6,16 +6,13 @@ import { Col, Input, Menu, Row } from "antd";
 import LoginForm from "./LoginForm";
 import UserProfile from "./UserProfile";
 
-// const dummy = {
-//   nickname: "제로초",
-//   Post: [],
-//   Followings: [],
-//   Followers: [],
-//   isLoggedIn: false,
-// };
+import {useSelector} from 'react-redux';
 
 const AppLayout = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  //isLoggedIn의 결과가 바뀌면 AppLayout 컴포넌트가 리렌더링 된다.
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+
   return (
     <div>
       <Menu mode="horizontal">
@@ -37,9 +34,9 @@ const AppLayout = ({ children }) => {
         <Col xs={24} md={6}>
           {/* {dummy.isLoggedIn ? <UserProfile /> : <LoginForm />} */}
           {isLoggedIn ? (
-            <UserProfile setIsLoggedIn={setIsLoggedIn} />
+            <UserProfile />
           ) : (
-            <LoginForm setIsLoggedIn={setIsLoggedIn} />
+            <LoginForm />
           )}
         </Col>
         <Col xs={24} md={12}>
