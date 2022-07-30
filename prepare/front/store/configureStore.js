@@ -1,10 +1,16 @@
 import { createWrapper } from "next-redux-wrapper";
-import { createStore } from "redux";
-
+import { applyMiddleware, compose, createStore } from "redux";
+import {composeWithDevTools} from 'redux-devtools-extension';
 import reducer from '../reducers'
 
 const configureStore = () => {
-  const store = createStore(reducer);
+  //미들웨어 사용
+  const middlewares = [];
+  const enhancer = process.env.NODE_ENV === 'production'
+  ? compose(applyMiddleware(...middlewares))  //운영(배포)용 : 데브툴 연결x
+  : composeWithDevTools(applyMiddleware(...middlewares))  //개발용 : 데브툴 연결 o
+
+  const store = createStore(reducer,enhancer);
 
   //dispatch 하는 순간 type과 data가 reducer로 전달된다. 그리고 초기state에서 다음 state가 생성된다.
   store.dispatch({
