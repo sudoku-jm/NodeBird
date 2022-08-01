@@ -1,7 +1,7 @@
 import {HYDRATE} from 'next-redux-wrapper';
 import { combineReducers } from 'redux';
-import user from '../reducers/user';
-import post from '../reducers/post';
+import user from './user';
+import post from './post';
 
 
 //reducer
