@@ -15,7 +15,8 @@ export const initalState = {
       },
       {
         src : 'https://images.unsplash.com/photo-1659204622556-148a4346af00?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=872&q=80'
-    }],
+      }
+    ],
     Comments : [
       {
         User : {
