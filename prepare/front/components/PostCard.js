@@ -60,7 +60,11 @@ const PostCard = ({post}) => {
       </Card>
       {commentFormOpended && (
         <div>
-          댓글 부분
+          <CommentForm/>
+          <List
+            header={`${post.Comments.length}개의 댓글`}
+            itemLayout="horizontal"
+          />
         </div>
       )}
       {/* <CommentForm/> */}
