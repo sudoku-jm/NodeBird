@@ -8,6 +8,21 @@ import UserProfile from "./UserProfile";
 
 import {useSelector} from 'react-redux';
 
+import { createGlobalStyle } from "styled-components";
+
+const Global = createGlobalStyle`
+  .ant-row {
+    margin-right: 0 !important;
+    margin-left:0 !important;
+  }
+  .ant-col:first-child{
+    padding-left:0 !important;
+  }
+  .ant-col:last-child{
+    padding-right: 0 !important;
+  }
+`;
+
 const AppLayout = ({ children }) => {
 
   //isLoggedIn의 결과가 바뀌면 AppLayout 컴포넌트가 리렌더링 된다.
@@ -16,6 +31,7 @@ const AppLayout = ({ children }) => {
 
   return (
     <div>
+      <Global/>
       <Menu mode="horizontal">
         <Menu.Item key="home">
           <Link href="/">
