@@ -8,15 +8,20 @@ import { loginRequestAction } from "../reducers/user";
 
 const LoginForm = () => {
   const dispatch = useDispatch()
-  const {isLoggedIn} = useSelector((state) => state.user);
+  const {isLoggingIn} = useSelector((state) => state.user);
+
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
+
+
   const onChangeId = useCallback((e) => {
     setId(e.target.value);
   }, []);
   const onChangePassword = useCallback((e) => {
     setPassword(e.target.value);
   }, []);
+
+  
   const styleFrom = useMemo(() => ({ padding: 10 }), []);
   const styleButton = useMemo(() => ({ marginTop: 10 }), []);
 
@@ -46,7 +51,7 @@ const LoginForm = () => {
           />
         </div>
         <div style={styleButton}>
-          <Button type="primary" htmlType="submit" loading={isLoggedIn}>
+          <Button type="primary" htmlType="submit" loading={isLoggingIn}>
             로그인
           </Button>
           <Link href="/signup">

@@ -30,7 +30,7 @@ const UserProfile = () => {
         </div>,
       ]}
     >
-      <Card.Meta avatar={<Avatar>JM</Avatar>} title={me.nickname[0]} />
+      <Card.Meta avatar={<Avatar>JM</Avatar>} title={me.nickname} />
       <Button onClick={onLogout} loading={isLoggingOut}>로그아웃</Button>
     </Card>
   );
