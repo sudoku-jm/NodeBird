@@ -4,11 +4,12 @@ import PropTypes from "prop-types";
 import useInput from "../hooks/useInput";
 // import { useSelector } from "react-redux";
 
-const CommentForm = ({ post }) => {
+// const CommentForm = ({ post }) => {
+const CommentForm = () => {
   // const id = useSelector((state) => state.user.me?.id);
   const [commentText, onChangeCommentText] = useInput("");
   const onSubmitComment = useCallback(() => {
-    console.log(post.id, commentText);
+    // console.log(post.id, commentText);
     //게시글 id 아래에 댓글을 달 것이므로.
   }, [commentText]);
 

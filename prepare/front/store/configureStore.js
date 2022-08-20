@@ -6,8 +6,9 @@ import reducer from '../reducers';
 import rootSaga from '../sagas';
 
 //3단 고차함수
-const loggerMiddleware = ({dispatch, getState}) => (next) => (action) => {
-  console.log(action);  
+// const loggerMiddleware = ({dispatch, getState}) => (next) => (action) => {
+const loggerMiddleware = () => (next) => (action) => {
+  // console.log(action);  
   return next(action);
 }
 

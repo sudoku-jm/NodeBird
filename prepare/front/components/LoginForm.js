@@ -3,11 +3,12 @@ import { useCallback, useState, useMemo } from "react";
 import { Form, Input, Button } from "antd";
 // import PropTypes from "prop-types";
 import Link from "next/link";
-import { useDispatch } from 'react-redux'
-import { loginAction } from "../reducers/user";
+import { useDispatch, useSelector } from 'react-redux'
+import { loginRequestAction } from "../reducers/user";
 
 const LoginForm = () => {
   const dispatch = useDispatch()
+  const {isLoggedIn} = useSelector((state) => state.user);
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const onChangeId = useCallback((e) => {
@@ -22,7 +23,7 @@ const LoginForm = () => {
   const onSubmitForm = useCallback(() => {
     /* onFinish는 e.preventDefault가 적용되어 있다. ant디자인에서는 쓰지 않는다.*/
     // console.log(id, password);
-    dispatch(loginAction(id, password));
+    dispatch(loginRequestAction(id, password));
   }, [id, password]);
   
   return (
@@ -45,7 +46,7 @@ const LoginForm = () => {
           />
         </div>
         <div style={styleButton}>
-          <Button type="primary" htmlType="submit" loading={false}>
+          <Button type="primary" htmlType="submit" loading={isLoggedIn}>
             로그인
           </Button>
           <Link href="/signup">
