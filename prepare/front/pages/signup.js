@@ -1,10 +1,12 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Form, Input, Checkbox, Button } from "antd";
 import PropTypes from "prop-types";
 
 import AppLayout from "../components/AppLayout";
 import useInput from "../hooks/useInput";
 import styled from "styled-components";
+import { signUpRequestAction } from "../reducers/user";
+import { useDispatch, useSelector } from "react-redux";
 
 const TextInput = ({ value }) => {
   return <div>{value}</div>;
@@ -19,14 +21,26 @@ const ErrorMsg = styled.div`
 `;
 
 const Signup = () => {
+  const dispatch = useDispatch();
+  const {signUpLoading, signUpDone} = useSelector((state) => state.user);
+  
+  const [email, onChangeEmail, setEmail] = useInput("");
+  const [nickname, onChangeNickname, setNickname] = useInput("");
+  const [password, onChangePassword, setPassword] = useInput("");
   const [passwordCheck, setPasswordCheck] = useState("");
   const [passwordError, setPasswordError] = useState(false);
   const [term, setTerm] = useState(false);
   const [termError, setTermError] = useState(false);
-
-  const [id, onChangeId] = useInput("");
-  const [nick, onChangeNick] = useInput("");
-  const [password, onChangePassword] = useInput("");
+  
+  useEffect(() => {
+    if(signUpDone){
+      setEmail('')
+      setNickname('')
+      setPassword('')
+      setPasswordCheck('')
+      setTerm(false)
+    }
+  },[signUpDone])
 
   const onSubmit = useCallback(() => {
     if (password !== passwordCheck) {
@@ -35,7 +49,8 @@ const Signup = () => {
     if (!term) {
       return setTermError(true);
     }
-  }, [password, passwordCheck, term]);
+    dispatch(signUpRequestAction(email,password,nickname))
+  }, [email, password, passwordCheck, term]);
 
   const onChangePasswordCheck = useCallback(
     (e) => {
@@ -53,20 +68,20 @@ const Signup = () => {
   return (
     <AppLayout>
       <Form onFinish={onSubmit} style={{ padding: 10 }}>
-        <TextInput value="135135" />
+        <TextInput value="회원가입" />
         <div>
-          <label htmlFor="user-id">아이디</label>
+          <label htmlFor="user-email">이메일</label>
           <br />
-          <Input name="user-id" value={id} required onChange={onChangeId} />
+          <Input name="user-email" type="email" value={email} required onChange={onChangeEmail} />
         </div>
         <div>
           <label htmlFor="user-nick">닉네임</label>
           <br />
           <Input
             name="user-nick"
-            value={nick}
+            value={nickname}
             required
-            onChange={onChangeNick}
+            onChange={onChangeNickname}
           />
         </div>
         <div>
@@ -99,7 +114,7 @@ const Signup = () => {
           {termError && <ErrorMsg>약관에 동의하셔야 합니다.</ErrorMsg>}
         </div>
         <div style={{ marginTop: 10 }}>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={signUpLoading}>
             가입하기
           </Button>
         </div>

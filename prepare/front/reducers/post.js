@@ -32,13 +32,12 @@ export const initalState = {
     }],
   }],
   imagePaths : [],
-  postAdded : false,  //게시글 추가 완료시 true
-}
-
-//액션 이름을 상수로 뺌. switch case에서 const값을 재활용 할 수 있다. 오탈자 방지 가능.
-const ADD_POST = 'ADD_POST';
-export const addPost = {
-  type : ADD_POST,
+  addPostLoading : false,  //게시글 작성 시도
+  addPostDone : false,
+  addPostError : false,
+  addCommentLoading : false,  //코멘트 작성 시도
+  addCommentDone : false,
+  addCommentError : false,
 }
 
 const dummyPost = {
@@ -52,13 +51,70 @@ const dummyPost = {
   Comments : [],
 }
 
+//액션 이름을 상수로 뺌. switch case에서 const값을 재활용 할 수 있다. 오탈자 방지 가능.
+export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
+export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
+export const ADD_POST_FAILRE = 'ADD_POST_FAILRE';
+
+export const ADD_COMMENT_REQUEST = 'ADD_COMMENT_REQUEST';
+export const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS';
+export const ADD_COMMENT_FAILRE = 'ADD_COMMENT_FAILRE';
+
+
+export const addPost = (data) => ({
+  type : ADD_POST_REQUEST,
+  data,
+})
+
+export const addComment = (data) => ({
+  type : ADD_COMMENT_REQUEST,
+  data,
+})
+
+
+
 const reducer = (state = initalState, action) => {
   switch(action.type){
-      case ADD_POST : 
+       //===============POST
+      case ADD_POST_REQUEST : 
+        return {
+          ...state,
+          addPostLoading : true,
+          addPostError : null,
+          addPostDone : false,
+        }
+      case ADD_POST_SUCCESS : 
         return {
           ...state,
           mainPosts : [dummyPost, ...state.mainPosts],
-          postAdded : true,
+          addPostLoading : false,
+          addPostDone : true,
+        }
+      case ADD_POST_FAILRE : 
+        return {
+          ...state,
+          addPostLoading : false,
+          addPostError : action.error
+        }
+       //===============COMMENT
+      case ADD_COMMENT_REQUEST : 
+        return {
+          ...state,
+          addCommentLoading : true,
+          addCommentDone : null,
+          addCommentError : false,
+        }
+      case ADD_COMMENT_SUCCESS : 
+        return {
+          ...state,
+          addCommentLoading : false,
+          addCommentDone : true,
+        }
+      case ADD_COMMENT_FAILRE : 
+        return {
+          ...state,
+          addCommentLoading : false,
+          addCommentError : action.error
         }
       default : 
         return state;

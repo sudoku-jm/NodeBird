@@ -27,7 +27,7 @@ const AppLayout = ({ children }) => {
 
   //isLoggedIn의 결과가 바뀌면 AppLayout 컴포넌트가 리렌더링 된다.
   // const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
-  const {isLoggedIn} = useSelector((state) => state.user);
+  const {me} = useSelector((state) => state.user);
 
   return (
     <div>
@@ -49,7 +49,7 @@ const AppLayout = ({ children }) => {
       </Menu>
       <Row gutter={8}>
         <Col xs={24} md={6}>
-          {isLoggedIn ? (
+          {me ? (
             <UserProfile />
           ) : (
             <LoginForm />

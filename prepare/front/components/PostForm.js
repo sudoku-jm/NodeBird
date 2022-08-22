@@ -1,23 +1,34 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import {Form, Input, Button} from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { addPost } from '../reducers/post';
+import useInput from '../hooks/useInput';
 
 const PostForm = () => {
   const dispatch = useDispatch();
-  const imageInput = useRef();
-  const {imagePaths} = useSelector((state) => state.post);
-  const [text, setText] = useState('');
-  const onChangeText = useCallback((e) => {
-    setText(e.target.value);
-  },[])
+  const {imagePaths, addPostDone} = useSelector((state) => state.post);
+
+  const [text, onChangeText, setText] = useInput("");
+  useEffect(() => {
+    if(addPostDone){
+      setText('')
+    }
+  },[addPostDone])
   const onSubmit = useCallback(() => {
-    dispatch(addPost);
-    setText('');
-  },[]);
+    dispatch( addPost(text) );
+
+    //만약 서버쪽에서 문제가 생겨 다시 시도해달라고 했을 때, 텍스트를 지워버리면 문제가 될 수 있다. setText('') 의 위치는 여기가 맞지않다.
+    //addPostDone 의 상태가 true가 되었을 때 지워주는게 더 정확하다.
+    // setText('');
+  },[text]);
+
+
+
+  const imageInput = useRef();
   const onClickImageUpload = useCallback(() => {
     imageInput.current.click();
   },[imageInput.current]);
+
   return(
     <Form style={{margin: '10px 0 20px'}} encType="multipart/form-data" onFinish={onSubmit}>
       <Input.TextArea value={text} onChange={onChangeText} maxLength={140} placeholder="어떤 신기한 일이 있었나요?"/>
