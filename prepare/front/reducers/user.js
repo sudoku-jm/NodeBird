@@ -41,13 +41,29 @@ export const CHANGE_NICKNAME_REQUEST = 'CHANGE_NICKNAME_REQUEST';
 export const CHANGE_NICKNAME_SUCCESS = 'CHANGE_NICKNAME_SUCCESS';
 export const CHANGE_NICKNAME_FAILRE = 'CHANGE_NICKNAME_FAILRE';
 
+export const ADD_POST_TO_ME = 'ADD_POST_TO_ME';
+export const REMOVE_POST_OF_ME = 'REMOVE_POST_OF_ME';
+
 const dummyUser = (data) => ({
   ...data,
   id: 1,
+  // email: data.email,
+  // password: data.password,
   nickname: '미니미니',
-  Posts: [],
-  Followings: [],
-  Followers: [],
+  Posts: [
+    { id: 1 },
+  ],
+  Followings: [
+    { nickname: '부기초' },
+    { nickname: 'minimini' },
+    { nickname: 'jm91' },
+  ],
+  Followers: [
+    { nickname: '부기초' },
+    { nickname: 'minimini' },
+    { nickname: 'jm91' },
+    { nickname: 'sudoku' },
+  ],
 });
 
 // 로그인 액션
@@ -89,6 +105,8 @@ const reducer = (state = initalState, action) => {
         logInLoading: false,
         logInDone: true,
         me: dummyUser(action.data),
+        // id: action.data.id,
+        // password: action.data.password,
       };
     case LOG_IN_FAILRE:
       return {
@@ -159,6 +177,23 @@ const reducer = (state = initalState, action) => {
         ...state,
         changeNicknameLoading: false,
         changeNicknameError: action.error
+      };
+    case ADD_POST_TO_ME:
+      return {
+        ...state,
+        me: {
+          ...state.me,
+          Posts: [{ id: action.data }, ...state.me.Posts]
+        }
+      };
+    case REMOVE_POST_OF_ME:
+      return {
+        ...state,
+        me: {
+          ...state.me,
+          Posts: state.me.Posts.filter((v) => v.id !== action.data)
+        }
+
       };
     default:
       return state;

@@ -6,7 +6,7 @@ import useInput from '../hooks/useInput';
 
 const PostForm = () => {
   const dispatch = useDispatch();
-  const { imagePaths, addPostDone } = useSelector((state) => state.post);
+  const { imagePaths, addPostLoading, addPostDone } = useSelector((state) => state.post);
 
   const [text, onChangeText, setText] = useInput('');
   useEffect(() => {
@@ -34,7 +34,7 @@ const PostForm = () => {
         {/* 이미지 업로드란 */}
         <input type="file" multiple hidden ref={imageInput} />
         <Button onClick={onClickImageUpload}>이미지 업로드</Button>
-        <Button type="primary" style={{ float: 'right' }} htmlType="submit">짹짹</Button>
+        <Button type="primary" loading={addPostLoading} htmlType="submit" style={{ float: 'right' }}>짹짹</Button>
       </div>
       <div>
         {/* 이미지 미리보기란 */}

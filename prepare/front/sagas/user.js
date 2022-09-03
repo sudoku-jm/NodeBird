@@ -18,7 +18,9 @@ function* logIn(action) {
 
     yield put({
       type: LOG_IN_SUCCESS,
-      data: action.data
+      data: {
+        email: action.data,
+      }
     });
   } catch (err) {
     yield put({

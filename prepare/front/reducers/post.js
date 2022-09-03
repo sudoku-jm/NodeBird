@@ -21,13 +21,17 @@ export const initalState = {
     ],
     Comments: [
       {
+        id: nanoid(),
         User: {
+          id: nanoid(),
           nickname: 'nero',
         },
         content: '안녕 반가워요',
       },
       {
+        id: nanoid(),
         User: {
+          id: nanoid(),
           nickname: 'jm',
         },
         content: '댓글은 이렇게 다는건가?',
@@ -37,14 +41,17 @@ export const initalState = {
   addPostLoading: false, // 게시글 작성 시도
   addPostDone: false,
   addPostError: false,
+  removePostLoading: false, // 게시글 삭제 시도
+  removePostDone: false,
+  removePostError: false,
   addCommentLoading: false, // 코멘트 작성 시도
   addCommentDone: false,
   addCommentError: false,
 };
 
 const dummyPost = (data) => ({
-  id: nanoid(),
-  content: data,
+  id: data.id,
+  content: data.content,
   User: {
     id: 1,
     nickname: '미니미니'
@@ -67,12 +74,21 @@ export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
 export const ADD_POST_FAILRE = 'ADD_POST_FAILRE';
 
+export const REMOVE_POST_REQUEST = 'REMOVE_POST_REQUEST';
+export const REMOVE_POST_SUCCESS = 'REMOVE_POST_SUCCESS';
+export const REMOVE_POST_FAILRE = 'REMOVE_POST_FAILRE';
+
 export const ADD_COMMENT_REQUEST = 'ADD_COMMENT_REQUEST';
 export const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS';
 export const ADD_COMMENT_FAILRE = 'ADD_COMMENT_FAILRE';
 
 export const addPost = (data) => ({
   type: ADD_POST_REQUEST,
+  data,
+});
+
+export const removePost = (data) => ({
+  type: REMOVE_POST_REQUEST,
   data,
 });
 
@@ -83,7 +99,7 @@ export const addComment = (data) => ({
 
 const reducer = (state = initalState, action) => {
   switch (action.type) {
-    //= ==============POST
+    //= ==============POST ADD
     case ADD_POST_REQUEST:
       return {
         ...state,
@@ -103,6 +119,27 @@ const reducer = (state = initalState, action) => {
         ...state,
         addPostLoading: false,
         addPostError: action.error
+      };
+      //= ==============POST REMOVE
+    case REMOVE_POST_REQUEST:
+      return {
+        ...state,
+        removePostLoading: true,
+        removePostError: null,
+        removePostDone: false,
+      };
+    case REMOVE_POST_SUCCESS:
+      return {
+        ...state,
+        mainPosts: state.mainPosts.filter((v) => v.id !== action.data),
+        removePostLoading: false,
+        removePostDone: true,
+      };
+    case REMOVE_POST_FAILRE:
+      return {
+        ...state,
+        removePostLoading: false,
+        removePostError: action.error
       };
       //= ==============COMMENT
     case ADD_COMMENT_REQUEST:
