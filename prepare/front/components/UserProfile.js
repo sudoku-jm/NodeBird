@@ -1,15 +1,14 @@
-import React from "react";
-import { Card, Avatar, Button } from "antd";
-import { useCallback } from "react";
+import React, { useCallback } from 'react';
+import { Card, Avatar, Button } from 'antd';
 // import PropTypes from "prop-types";
-import { useDispatch, useSelector } from "react-redux";
-import {logoutRequestAction} from "../reducers/user";
+import { useDispatch, useSelector } from 'react-redux';
+import { logoutRequestAction } from '../reducers/user';
+
 const UserProfile = () => {
-
   const dispatch = useDispatch();
-  const {me, logOutLoading} = useSelector((state) => state.user);
+  const { me, logOutLoading } = useSelector((state) => state.user);
 
-  //로그아웃
+  // 로그아웃
   const onLogout = useCallback(() => {
     dispatch(logoutRequestAction());
   }, []);

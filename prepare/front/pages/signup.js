@@ -1,46 +1,47 @@
-import React, { useState, useCallback, useEffect } from "react";
-import { Form, Input, Checkbox, Button } from "antd";
-import PropTypes from "prop-types";
+import React, { useState, useCallback, useEffect } from 'react';
+import { Form, Input, Checkbox, Button } from 'antd';
+import PropTypes from 'prop-types';
 
-import AppLayout from "../components/AppLayout";
-import useInput from "../hooks/useInput";
-import styled from "styled-components";
-import { signUpRequestAction } from "../reducers/user";
-import { useDispatch, useSelector } from "react-redux";
+import styled from 'styled-components';
+import { useDispatch, useSelector } from 'react-redux';
+import AppLayout from '../components/AppLayout';
+import useInput from '../hooks/useInput';
+// import { signUpRequestAction, SIGN_UP_REQUEST } from "../reducers/user";
+import { signUpRequestAction } from '../reducers/user';
 
-const TextInput = ({ value }) => {
+function TextInput({ value }) {
   return <div>{value}</div>;
-};
+}
 
 TextInput.propTypes = {
-  value: PropTypes.string,
+  value: PropTypes.string.isRequired,
 };
 
 const ErrorMsg = styled.div`
   color: red;
 `;
 
-const Signup = () => {
+function Signup() {
   const dispatch = useDispatch();
-  const {signUpLoading, signUpDone} = useSelector((state) => state.user);
-  
-  const [email, onChangeEmail, setEmail] = useInput("");
-  const [nickname, onChangeNickname, setNickname] = useInput("");
-  const [password, onChangePassword, setPassword] = useInput("");
-  const [passwordCheck, setPasswordCheck] = useState("");
+  const { signUpLoading, signUpDone } = useSelector((state) => state.user);
+
+  const [email, onChangeEmail, setEmail] = useInput('');
+  const [nickname, onChangeNickname, setNickname] = useInput('');
+  const [password, onChangePassword, setPassword] = useInput('');
+  const [passwordCheck, setPasswordCheck] = useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [term, setTerm] = useState(false);
   const [termError, setTermError] = useState(false);
-  
+
   useEffect(() => {
-    if(signUpDone){
-      setEmail('')
-      setNickname('')
-      setPassword('')
-      setPasswordCheck('')
-      setTerm(false)
+    if (signUpDone) {
+      setEmail('');
+      setNickname('');
+      setPassword('');
+      setPasswordCheck('');
+      setTerm(false);
     }
-  },[signUpDone])
+  }, [signUpDone]);
 
   const onSubmit = useCallback(() => {
     if (password !== passwordCheck) {
@@ -49,15 +50,20 @@ const Signup = () => {
     if (!term) {
       return setTermError(true);
     }
-    dispatch(signUpRequestAction(email,password,nickname))
+    dispatch(signUpRequestAction(email, password, nickname));
+    // 또는
+    /* dispatch({
+      type : SIGN_UP_REQUEST,
+      data : {email, password, term}
+    }) */
   }, [email, password, passwordCheck, term]);
 
   const onChangePasswordCheck = useCallback(
     (e) => {
-      setPasswordError(e.target.value !== password); //해당부분이 달라 커스텀 훅을 쓰지 않음.
+      setPasswordError(e.target.value !== password); // 해당부분이 달라 커스텀 훅을 쓰지 않음.
       setPasswordCheck(e.target.value);
     },
-    [password]
+    [password],
   );
 
   const onChangeTerm = useCallback((e) => {
@@ -121,6 +127,6 @@ const Signup = () => {
       </Form>
     </AppLayout>
   );
-};
+}
 
 export default Signup;

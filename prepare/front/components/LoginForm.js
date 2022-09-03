@@ -1,18 +1,16 @@
-import React from "react";
-import { useCallback, useState, useMemo } from "react";
-import { Form, Input, Button } from "antd";
+import React, { useCallback, useState, useMemo } from 'react';
+import { Form, Input, Button } from 'antd';
 // import PropTypes from "prop-types";
-import Link from "next/link";
-import { useDispatch, useSelector } from 'react-redux'
-import { loginRequestAction } from "../reducers/user";
+import Link from 'next/link';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginRequestAction } from '../reducers/user';
 
 const LoginForm = () => {
-  const dispatch = useDispatch()
-  const {logInDone} = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const { logInLoading } = useSelector((state) => state.user);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const onChangeEmail = useCallback((e) => {
     setEmail(e.target.value);
@@ -21,49 +19,45 @@ const LoginForm = () => {
     setPassword(e.target.value);
   }, []);
 
-  
   const styleFrom = useMemo(() => ({ padding: 10 }), []);
   const styleButton = useMemo(() => ({ marginTop: 10 }), []);
 
   const onSubmitForm = useCallback(() => {
-    /* onFinish는 e.preventDefault가 적용되어 있다. ant디자인에서는 쓰지 않는다.*/
+    /* onFinish는 e.preventDefault가 적용되어 있다. ant디자인에서는 쓰지 않는다. */
     // console.log(id, password);
     dispatch(loginRequestAction(email, password));
   }, [email, password]);
-  
+
   return (
-    <>
-      <Form onFinish={onSubmitForm} style={styleFrom}>
-        <div>
-          <label htmlFor="user-email">이메일</label>
-          <br />
-          <Input name="user-email" type="email" value={email} onChange={onChangeEmail} required />
-        </div>
-        <div>
-          <label htmlFor="user-password">비밀번호</label>
-          <br />
-          <Input
-            type="password"
-            name="user-password"
-            value={password}
-            onChange={onChangePassword}
-            required
-          />
-        </div>
-        <div style={styleButton}>
-          <Button type="primary" htmlType="submit" loading={logInDone}>
-            로그인
-          </Button>
-          <Link href="/signup">
-            <a>
-              <Button>회원가입</Button>
-            </a>
-          </Link>
-        </div>
-      </Form>
-    </>
+    <Form onFinish={onSubmitForm} style={styleFrom}>
+      <div>
+        <label htmlFor="user-email">이메일</label>
+        <br />
+        <Input name="user-email" type="email" value={email} onChange={onChangeEmail} required />
+      </div>
+      <div>
+        <label htmlFor="user-password">비밀번호</label>
+        <br />
+        <Input
+          type="password"
+          name="user-password"
+          value={password}
+          onChange={onChangePassword}
+          required
+        />
+      </div>
+      <div style={styleButton}>
+        <Button type="primary" htmlType="submit" loading={logInLoading}>
+          로그인
+        </Button>
+        <Link href="/signup">
+          <a>
+            <Button>회원가입</Button>
+          </a>
+        </Link>
+      </div>
+    </Form>
   );
 };
-
 
 export default LoginForm;

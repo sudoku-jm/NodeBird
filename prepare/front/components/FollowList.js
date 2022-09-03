@@ -1,8 +1,9 @@
-import React, { useMemo } from "react";
-import PropTypes from "prop-types";
-import { List, Card } from "antd";
-import { StopOutlined } from "@ant-design/icons";
-import styled from "styled-components";
+import React, { useMemo } from 'react';
+import PropTypes from 'prop-types';
+import { List, Card } from 'antd';
+import { StopOutlined } from '@ant-design/icons';
+import styled from 'styled-components';
+
 const ListMore = styled.div`
   text-align: center;
   margin: "10px 0";
@@ -10,13 +11,13 @@ const ListMore = styled.div`
 const FollowList = ({ header, data }) => {
   const styleList = useMemo(
     () => ({
-      marginBottom: "20px",
+      marginBottom: '20px',
     }),
     []
   );
   const styleListItem = useMemo(
     () => ({
-      marginTop: "20px",
+      marginTop: '20px',
     }),
     []
   );
@@ -37,7 +38,7 @@ const FollowList = ({ header, data }) => {
           </Card>
         </List.Item>
       )}
-    ></List>
+    />
   );
 };
 

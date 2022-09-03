@@ -1,14 +1,12 @@
-import React from "react";
-import Link from "next/link";
-import PropTypes from "prop-types";
-import { Col, Input, Menu, Row } from "antd";
+import React from 'react';
+import Link from 'next/link';
+import PropTypes from 'prop-types';
+import { Col, Input, Menu, Row } from 'antd';
 
-import LoginForm from "./LoginForm";
-import UserProfile from "./UserProfile";
-
-import {useSelector} from 'react-redux';
-
-import { createGlobalStyle } from "styled-components";
+import { useSelector } from 'react-redux';
+import { createGlobalStyle } from 'styled-components';
+import LoginForm from './LoginForm';
+import UserProfile from './UserProfile';
 
 const Global = createGlobalStyle`
   .ant-row {
@@ -24,14 +22,13 @@ const Global = createGlobalStyle`
 `;
 
 const AppLayout = ({ children }) => {
-
-  //isLoggedIn의 결과가 바뀌면 AppLayout 컴포넌트가 리렌더링 된다.
+  // isLoggedIn의 결과가 바뀌면 AppLayout 컴포넌트가 리렌더링 된다.
   // const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
-  const {me} = useSelector((state) => state.user);
+  const { me } = useSelector((state) => state.user);
 
   return (
     <div>
-      <Global/>
+      <Global />
       <Menu mode="horizontal">
         <Menu.Item key="home">
           <Link href="/">
@@ -44,7 +41,7 @@ const AppLayout = ({ children }) => {
           </Link>
         </Menu.Item>
         <Menu.Item key="mail">
-          <Input.Search enterButton style={{ verticalAlign: "middle" }} />
+          <Input.Search enterButton style={{ verticalAlign: 'middle' }} />
         </Menu.Item>
       </Menu>
       <Row gutter={8}>
