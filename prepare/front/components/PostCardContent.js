@@ -13,14 +13,16 @@ const PostCardContent = ({ postData }) => {
                 [결과]
                 ['첫 번째 게시글 ', '#해시태그', ' ', '#익스프레스', '']
             */}
-      {postData.split(/(#[^\s#]+)/g).map((v, i) => {
+      {
+        postData.split(/(#[^\s#]+)/g).map((v, i) => {
         // 일반 텍스트는 v로 그냥 리턴 정규표현식에 부합하는 경우는 Link안에 넣어서 리턴
-        if (v.match(/(#[^\s#]+)/)) {
-          return <Link href={`/hashtag/${v.slice(1)}`} key={i}><a>{v}</a></Link>;
-        }
+          if (v.match(/(#[^\s#]+)/)) {
+            return <Link href={`/hashtag/${v.slice(1)}`} key={i}><a>{v}</a></Link>;
+          }
 
-        return v;
-      })}
+          return v;
+        })
+      }
     </div>
   );
 };

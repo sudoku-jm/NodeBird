@@ -1,76 +1,55 @@
 import { nanoid } from 'nanoid';
 import produce from 'immer';
+import faker from 'faker';
 
 export const initalState = {
-  mainPosts: [{
-    id: 1,
-    User: {
-      id: 1,
-      nickname: 'jm'
-    },
-    content: '첫 번째 게시글 #해시태그 #익스프레스',
-    Images: [
-      {
-        src: 'https://images.unsplash.com/photo-1659114538192-0f8caaaaa698?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80'
-      },
-      {
-        src: 'https://images.unsplash.com/photo-1657299156528-2d50a9a6a444?ixlib=rb-1.2.1&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80'
-      },
-      {
-        src: 'https://images.unsplash.com/photo-1659204622556-148a4346af00?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=872&q=80'
-      }
-    ],
-    Comments: [
-      {
-        id: nanoid(),
-        User: {
-          id: nanoid(),
-          nickname: 'nero',
-        },
-        content: '안녕 반가워요',
-      },
-      {
-        id: nanoid(),
-        User: {
-          id: nanoid(),
-          nickname: 'jm',
-        },
-        content: '댓글은 이렇게 다는건가?',
-      }],
-  }],
+  mainPosts: [],
   imagePaths: [],
+  hasMorePosts: true, // 데이터 더이상 불러 올게 없을 경우 false
+  loadPostsLoading: false, // 데이터 로드 시도
+  loadPostsDone: false,
+  loadPostsError: null,
   addPostLoading: false, // 게시글 작성 시도
   addPostDone: false,
-  addPostError: false,
+  addPostError: null,
   removePostLoading: false, // 게시글 삭제 시도
   removePostDone: false,
-  removePostError: false,
+  removePostError: null,
   addCommentLoading: false, // 코멘트 작성 시도
   addCommentDone: false,
-  addCommentError: false,
+  addCommentError: null,
 };
 
-const dummyPost = (data) => ({
-  id: data.id,
-  content: data.content,
-  User: {
-    id: 1,
-    nickname: '미니미니'
-  },
-  Images: [],
-  Comments: [],
-});
-
-const dummyComment = (data) => ({
+export const generateDummyPost = (number) => Array(number).fill().map(() => ({
   id: nanoid(),
-  content: data,
   User: {
-    id: 1,
-    nickname: '미니미니'
+    id: nanoid(),
+    nickname: faker.name.findName(),
   },
-});
+  content: faker.lorem.paragraph(),
+  Images: [{
+    src: faker.image.image()
+    // src: 'https://picsum.photos/seed/picsum/200/300'
+  }],
+  Comments: [{
+    User: {
+      id: nanoid(),
+      nickname: faker.name.findName()
+    },
+    content: faker.lorem.sentence(),
+  }],
+}));
+
+// 더미데이터 추가 faker
+// initalState.mainPosts = initalState.mainPosts.concat(
+//   generateDummyPost(10)
+// );
 
 // 액션 이름을 상수로 뺌. switch case에서 const값을 재활용 할 수 있다. 오탈자 방지 가능.
+export const LOAD_POSTS_REQUEST = 'LOAD_POSTS_REQUEST'; // 화면 로드
+export const LOAD_POSTS_SUCCESS = 'LOAD_POSTS_SUCCESS'; // 화면 로드 성공
+export const LOAD_POSTS_FAILRE = 'LOAD_POSTS_FAILRE'; // 화면 로드 실패
+
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
 export const ADD_POST_FAILRE = 'ADD_POST_FAILRE';
@@ -99,8 +78,26 @@ export const addComment = (data) => ({
 });
 
 const reducer = (state = initalState, action) => {
-  return produce(state, (draft) => {
+  return produce(state, (d) => {
+    const draft = d;
     switch (action.type) {
+      //= ============== LOAD
+      case LOAD_POSTS_REQUEST:
+        draft.loadPostsLoading = true;
+        draft.loadPostsError = null;
+        draft.loadPostsDone = false;
+        break;
+      case LOAD_POSTS_SUCCESS:
+        // action.data 기존데이터 + concat으로 불러오는 데이터 합쳐주기
+        draft.mainPosts = action.data.concat(draft.mainPosts);
+        draft.hasMorePosts = draft.mainPosts.length < 50; // 50개미만 true
+        draft.loadPostsLoading = false;
+        draft.loadPostsDone = true;
+        break;
+      case LOAD_POSTS_FAILRE:
+        draft.loadPostsLoading = false;
+        draft.loadPostsError = action.error;
+        break;
       //= ==============POST ADD
       case ADD_POST_REQUEST:
         draft.addPostLoading = true;
@@ -108,7 +105,7 @@ const reducer = (state = initalState, action) => {
         draft.addPostDone = false;
         break;
       case ADD_POST_SUCCESS:
-        draft.mainPosts.unshift(dummyPost(action.data));
+        // draft.mainPosts.unshift(dummyPost(action.data));
         draft.addPostLoading = false;
         draft.addPostDone = true;
         break;
@@ -139,8 +136,8 @@ const reducer = (state = initalState, action) => {
         draft.addCommentError = false;
         break;
       case ADD_COMMENT_SUCCESS: {
-        const post = draft.mainPosts.find((v) => v.id === action.data.postId);
-        post.Comments.unshift(dummyComment(action.data.content));
+        // const post = draft.mainPosts.find((v) => v.id === action.data.postId);
+        // post.Comments.unshift(dummyComment(action.data.content));
         draft.addCommentLoading = false;
         draft.addCommentDone = true;
         break;

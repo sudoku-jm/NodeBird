@@ -1,6 +1,12 @@
 import produce from 'immer';
 
 export const initalState = {
+  followLoading: false, // follow 시도중
+  followDone: false,
+  followError: null,
+  unfollowLoading: false, // follow 시도중
+  unfollowDone: false,
+  unfollowError: null,
   logInLoading: false, // 로그인 시도중
   logInDone: false,
   logInError: null,
@@ -93,8 +99,39 @@ export const signUpRequestAction = (data) => {
 };
 
 const reducer = (state = initalState, action) => {
-  return produce(state, (draft) => {
+  return produce(state, (d) => {
+    const draft = d;
     switch (action.type) {
+      //= ============== FOLLOW
+      case FOLLOW_REQUEST:
+        draft.followLoading = true;
+        draft.followError = null;
+        draft.followDone = false;
+        break;
+      case FOLLOW_SUCCESS:
+        draft.followLoading = false;
+        draft.followDone = true;
+        draft.me.Followings.push({ id: action.data }); // 팔로우 하려는 사람 아이디추가
+        break;
+      case FOLLOW_FAILRE:
+        draft.followLoading = false;
+        draft.followError = action.error;
+        break;
+      //= ============== UNFOLLOW
+      case UNFOLLOW_REQUEST:
+        draft.unfollowLoading = true;
+        draft.unfollowError = null;
+        draft.unfollowDone = false;
+        break;
+      case UNFOLLOW_SUCCESS:
+        draft.unfollowLoading = false;
+        draft.unfollowDone = true;
+        draft.me.Followings = draft.me.Followings.filter((v) => v.id !== action.data);
+        break;
+      case UNFOLLOW_FAILRE:
+        draft.unfollowLoading = false;
+        draft.unfollowError = action.error;
+        break;
       //= ==============로그인
       case LOG_IN_REQUEST:
         draft.logInLoading = true;
