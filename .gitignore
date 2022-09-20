@@ -1,6 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
+/prepare/back/node_modules
 /prepare/front/node_modules
 /prepare/front_back/node_modules
 /node_modules
