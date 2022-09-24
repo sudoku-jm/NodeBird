@@ -1,7 +1,14 @@
 const express = require('express');
 const postRouter = require('./routes/post'); 
-
+const db = require('./models'); // model > index.js 에서 등록된 db를 들고온다.
 const app = express(); //호출을 한 번 해야한다.
+
+//model > index.js 에서 등록한 db를 sync() 메소드를 통해 연결.
+db.sequelize.sync()
+  .then(() => {
+    console.log('db 연결 성공');
+  })
+  .catch(console.error);
 
 
 
@@ -26,5 +33,5 @@ app.get('/posts',(req, res) => {
 app.use('/post',postRouter); 
 
 app.listen(5500, () => {
-  console.log('서버 실행 중');
+  console.log('서버 실행 중~!~!~!');
 });
