@@ -1,4 +1,5 @@
-import { all, delay, fork, put, takeLatest } from 'redux-saga/effects';
+import { all, delay, fork, put, takeLatest, call } from 'redux-saga/effects';
+import axios from 'axios';
 import {
   FOLLOW_FAILRE, FOLLOW_REQUEST, FOLLOW_SUCCESS,
   UNFOLLOW_FAILRE, UNFOLLOW_REQUEST, UNFOLLOW_SUCCESS,
@@ -6,7 +7,6 @@ import {
   LOG_OUT_FAILRE, LOG_OUT_REQUEST, LOG_OUT_SUCCESS,
   SIGN_UP_FAILRE, SIGN_UP_REQUEST, SIGN_UP_SUCCESS,
 } from '../reducers/user';
-// import axios from 'axios';
 
 /* ==========로그인============ */
 // function loginAPI(data) {
@@ -56,14 +56,18 @@ function* logOut() {
 
 /* ==========회원가입============ */
 
-// function signUpAPI() {
-//     return axios.post('/api/signup')
-// }
+function signUpAPI(data) {
+  return axios.post('http://localhost:5500/user', data);
+  /*
+    data는 email, nickname, password라는 객체이다.
+    backend로 전달(서버)
+  */
+}
 
-function* signUp() {
+function* signUp(action) {
   try {
-    //    const result = yield call(signUpAPI) ;
-    yield delay(1000);
+    const result = yield call(signUpAPI, action.data);
+    console.log('signUpAPI', result);
     // throw new Error('');
     yield put({
       type: SIGN_UP_SUCCESS,

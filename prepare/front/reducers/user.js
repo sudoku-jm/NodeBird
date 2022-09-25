@@ -91,12 +91,13 @@ export const logoutRequestAction = () => {
 };
 
 // 회원가입 액션
-export const signUpRequestAction = (data) => {
-  return {
-    type: SIGN_UP_REQUEST,
-    data,
-  };
-};
+// export const signUpRequestAction = (data) => {
+//   console.log('signUpRequestAction data', data);
+//   return {
+//     type: SIGN_UP_REQUEST,
+//     data,
+//   };
+// };
 
 const reducer = (state = initalState, action) => {
   return produce(state, (d) => {

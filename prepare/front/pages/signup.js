@@ -1,13 +1,13 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Form, Input, Checkbox, Button } from 'antd';
 import PropTypes from 'prop-types';
-
+import Router from 'next/router';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import AppLayout from '../components/AppLayout';
 import useInput from '../hooks/useInput';
 // import { signUpRequestAction, SIGN_UP_REQUEST } from "../reducers/user";
-import { signUpRequestAction } from '../reducers/user';
+import { SIGN_UP_REQUEST } from '../reducers/user';
 
 function TextInput({ value }) {
   return <div>{value}</div>;
@@ -23,7 +23,7 @@ const ErrorMsg = styled.div`
 
 function Signup() {
   const dispatch = useDispatch();
-  const { signUpLoading, signUpDone } = useSelector((state) => state.user);
+  const { signUpLoading, signUpDone, signUpError } = useSelector((state) => state.user);
 
   const [email, onChangeEmail, setEmail] = useInput('');
   const [nickname, onChangeNickname, setNickname] = useInput('');
@@ -40,8 +40,15 @@ function Signup() {
       setPassword('');
       setPasswordCheck('');
       setTerm(false);
+      Router.push('/');
     }
   }, [signUpDone]);
+
+  useEffect(() => {
+    if (signUpError) {
+      alert(signUpError);
+    }
+  }, [signUpError]);
 
   const onSubmit = useCallback(() => {
     if (password !== passwordCheck) {
@@ -50,12 +57,10 @@ function Signup() {
     if (!term) {
       return setTermError(true);
     }
-    dispatch(signUpRequestAction(email, password, nickname));
-    // 또는
-    /* dispatch({
-      type : SIGN_UP_REQUEST,
-      data : {email, password, term}
-    }) */
+    dispatch({
+      type: SIGN_UP_REQUEST,
+      data: { email, password, nickname }
+    });
   }, [email, password, passwordCheck, term]);
 
   const onChangePasswordCheck = useCallback(

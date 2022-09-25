@@ -1,4 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
+    //모델 만들기
     const User = sequelize.define('User',{
         // id : {}, 자동으로 생성되므로 생략.
         email : {
