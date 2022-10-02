@@ -9,20 +9,20 @@ import {
 } from '../reducers/user';
 
 /* ==========로그인============ */
-// function loginAPI(data) {
-//     return axios.post('/api/login',data)
-// }
+function loginAPI(data) {
+  // data.email, data.password 전달.
+  return axios.post('/user/login', data);
+}
 
 function* logIn(action) {
   try {
-    //    const result = yield call(loginAPI, action.data)
-    yield delay(1000);
+    const result = yield call(loginAPI, action.data);
+    console.log('result loginAPI', result);
+    // yield delay(1000);
 
     yield put({
       type: LOG_IN_SUCCESS,
-      data: {
-        email: action.data,
-      }
+      data: result.data,
     });
   } catch (err) {
     yield put({
@@ -33,14 +33,15 @@ function* logIn(action) {
 }
 
 /* ==========로그아웃============ */
-// function logoutAPI() {
-//     return axios.post('/api/logout')
-// }
+function logoutAPI() {
+  return axios.post('/user/logout');
+}
 
 function* logOut() {
   try {
-    //    const result = yield call(logoutAPI) ;
-    yield delay(1000);
+    const result = yield call(logoutAPI);
+    console.log('result logoutAPI', result);
+    // yield delay(1000);
 
     yield put({
       type: LOG_OUT_SUCCESS,
@@ -57,7 +58,7 @@ function* logOut() {
 /* ==========회원가입============ */
 
 function signUpAPI(data) {
-  return axios.post('http://localhost:5500/user', data);
+  return axios.post('/user', data);
   /*
     data는 email, nickname, password라는 객체이다.
     backend로 전달(서버)

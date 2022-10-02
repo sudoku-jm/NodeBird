@@ -24,7 +24,7 @@ const LoginForm = () => {
 
   const onSubmitForm = useCallback(() => {
     /* onFinish는 e.preventDefault가 적용되어 있다. ant디자인에서는 쓰지 않는다. */
-    // console.log(email, password);
+    console.log('onSubmitForm', email, password);
     dispatch(loginRequestAction(email, password));
   }, [email, password]);
 

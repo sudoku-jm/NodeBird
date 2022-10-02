@@ -76,10 +76,15 @@ const dummyUser = (data) => ({
 });
 
 // 로그인 액션
-export const loginRequestAction = (data) => {
+export const loginRequestAction = (email, password) => {
+  // data.email, data.password가 saga로 전달.
+  console.log('loginRequestAction data', email, password);
   return {
     type: LOG_IN_REQUEST,
-    data
+    data: {
+      email,
+      password
+    }
   };
 };
 
@@ -142,7 +147,7 @@ const reducer = (state = initalState, action) => {
       case LOG_IN_SUCCESS:
         draft.logInLoading = false;
         draft.logInDone = true;
-        draft.me = dummyUser(action.data);
+        draft.me = action.data;
         break;
       case LOG_IN_FAILRE:
         draft.logInLoading = false;
