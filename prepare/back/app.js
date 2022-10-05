@@ -72,6 +72,11 @@ app.use('/post',postRouter);
 //유저정보, 회원가입
 app.use('/user',userRouter); 
 
+//에러처리 미들웨어는 마지막으로 들어감. 직접 작성해줄 수 있다.
+app.use((err, req, res, next) => {
+
+});
+
 app.listen(5500, () => {
   console.log('서버 실행 중~!~!~!');
 });

@@ -1,6 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const { User } = require('../models');
+const { User, Post } = require('../models');
+const {isLoggedIn, isNotLoggedIn} = require('./middlewares');
 const passport = require('passport');
 const router = express.Router();
 
@@ -16,12 +17,12 @@ const router = express.Router();
 */
 
 //로그인
-router.post('/login', (req, res, next) => {//미들웨어 확장.
+router.post('/login', isNotLoggedIn, (req, res, next) => {//미들웨어 확장.
     passport.authenticate('local', (err, user, info) => {
         //passport > local.js 성공 시 콜백 실행.
         if(err){ //done(erorr) 로 왔을 때. 클라이언트쪽에선 null이다.
             console.error(err);
-            return next(err)
+            return next(err);
         }
 
         if(info){ //info에 값이 있을 경우는 클라이언트 에러.
@@ -39,20 +40,52 @@ router.post('/login', (req, res, next) => {//미들웨어 확장.
             // local.js > return done(null, user); 전달 받은 내용 
 
             // res.setHeader('Cookie', 'cxlhy');
-            return res.status(200).json(user);
+
+            //fullUserWithoutPassword : password 제외 모든 정보를 다 집어넣은 유저.
+            // 사용자 정보는 있는데 왜 다시 User DB에서 또 찾는가? 
+            // include를 사용하여 여기에서 정보를 더해줄 수 있기 때문이다.
+            // user는 필요없는 비밀번호는 있는데 Posts, Followers, Followings는 없기 때문이다.
+            const fullUserWithoutPassword = await User.findOne({
+                where : { id : user.id },
+                // attributes : ['id','nickname','email'],
+                attributes : {
+                    exclude : ['password']
+                },
+                include : [{
+                    model : Post,
+                },{
+                    model : User,
+                    as : 'Followings'
+                },{
+                    model : User,
+                    as : 'Followers'
+                }]
+            });
+            return res.status(200).json(fullUserWithoutPassword);
         })
     })(req, res, next);
 });
 
 
 //로그아웃
-router.post('/logout', (req, res) => {
-    req.logout();
-    req.session.destroy(); //유저 정보 세션에서 삭제
-    res.send('ok');
+router.post('/logout', isLoggedIn, (req, res) => {
+    //passport 0.5버전
+    // req.logout(() => {});
+    // req.session.destroy(); //유저 정보 세션에서 삭제
+    // res.status(200).send('ok');
+
+    //passport 0.6버전
+    req.logout((err) => {
+		req.session.destroy();
+		if (err) {
+			res.redirect("/");
+		} else {
+			res.status(200).send("server ok: 로그아웃 완료");
+		}
+	});
 });
 
-router.post('/', async (req ,res, next) => {    //POST /user
+router.post('/', isNotLoggedIn, async (req ,res, next) => {    //POST /user
     console.log('req',req.body);
     try{
 
