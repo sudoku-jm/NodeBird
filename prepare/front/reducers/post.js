@@ -1,11 +1,17 @@
-import { nanoid } from 'nanoid';
+// import { nanoid } from 'nanoid';
 import produce from 'immer';
-import faker from 'faker';
+// import faker from 'faker';
 
 export const initalState = {
   mainPosts: [],
   imagePaths: [],
   hasMorePosts: true, // 데이터 더이상 불러 올게 없을 경우 false
+  likePostLoading: false, // LIKE POST
+  likePostDone: false,
+  likePostError: null,
+  unlikePostLoading: false, // UNLIKE POST
+  unlikePostDone: false,
+  unlikePostError: null,
   loadPostsLoading: false, // 데이터 로드 시도
   loadPostsDone: false,
   loadPostsError: null,
@@ -20,25 +26,25 @@ export const initalState = {
   addCommentError: null,
 };
 
-export const generateDummyPost = (number) => Array(number).fill().map(() => ({
-  id: nanoid(),
-  User: {
-    id: nanoid(),
-    nickname: faker.name.findName(),
-  },
-  content: faker.lorem.paragraph(),
-  Images: [{
-    src: faker.image.image()
-    // src: 'https://picsum.photos/seed/picsum/200/300'
-  }],
-  Comments: [{
-    User: {
-      id: nanoid(),
-      nickname: faker.name.findName()
-    },
-    content: faker.lorem.sentence(),
-  }],
-}));
+// export const generateDummyPost = (number) => Array(number).fill().map(() => ({
+//   id: nanoid(),
+//   User: {
+//     id: nanoid(),
+//     nickname: faker.name.findName(),
+//   },
+//   content: faker.lorem.paragraph(),
+//   Images: [{
+//     src: faker.image.image()
+//     // src: 'https://picsum.photos/seed/picsum/200/300'
+//   }],
+//   Comments: [{
+//     User: {
+//       id: nanoid(),
+//       nickname: faker.name.findName()
+//     },
+//     content: faker.lorem.sentence(),
+//   }],
+// }));
 
 // 더미데이터 추가 faker
 // initalState.mainPosts = initalState.mainPosts.concat(
@@ -46,6 +52,14 @@ export const generateDummyPost = (number) => Array(number).fill().map(() => ({
 // );
 
 // 액션 이름을 상수로 뺌. switch case에서 const값을 재활용 할 수 있다. 오탈자 방지 가능.
+export const LIKE_POST_REQUEST = 'LIKE_POST_REQUEST';
+export const LIKE_POST_SUCCESS = 'LIKE_POST_SUCCESS';
+export const LIKE_POST_FAILRE = 'LIKE_POST_FAILRE';
+
+export const UNLIKE_POST_REQUEST = 'UNLIKE_POST_REQUEST';
+export const UNLIKE_POST_SUCCESS = 'UNLIKE_POST_SUCCESS';
+export const UNLIKE_POST_FAILRE = 'UNLIKE_POST_FAILRE';
+
 export const LOAD_POSTS_REQUEST = 'LOAD_POSTS_REQUEST'; // 화면 로드
 export const LOAD_POSTS_SUCCESS = 'LOAD_POSTS_SUCCESS'; // 화면 로드 성공
 export const LOAD_POSTS_FAILRE = 'LOAD_POSTS_FAILRE'; // 화면 로드 실패
@@ -81,7 +95,42 @@ const reducer = (state = initalState, action) => {
   return produce(state, (d) => {
     const draft = d;
     switch (action.type) {
-      //= ============== LOAD
+      //= ============== UNLIKE POST
+      case UNLIKE_POST_REQUEST:
+        draft.unlikePostLoading = true;
+        draft.unlikePostError = null;
+        draft.unlikePostDone = false;
+        break;
+      case UNLIKE_POST_SUCCESS: {
+        const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
+        post.Likers = post.Likers.filter((v) => v.id === action.data.Postid);
+        draft.unlikePostLoading = false;
+        draft.unlikePostDone = true;
+        break;
+      }
+      case UNLIKE_POST_FAILRE:
+        draft.unlikePostLoading = false;
+        draft.unlikePostError = action.error;
+        break;
+      //= ============== LIKE POST
+      case LIKE_POST_REQUEST:
+        draft.likePostLoading = true;
+        draft.likePostError = null;
+        draft.likePostDone = false;
+        break;
+      case LIKE_POST_SUCCESS: {
+        // action.data가 넘어온다.
+        const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
+        post.Likers.push({ id: action.data.UserId });
+        draft.likePostLoading = false;
+        draft.likePostDone = true;
+        break;
+      }
+      case LIKE_POST_FAILRE:
+        draft.likePostLoading = false;
+        draft.likePostError = action.error;
+        break;
+      //= ============== LOAD POST
       case LOAD_POSTS_REQUEST:
         draft.loadPostsLoading = true;
         draft.loadPostsError = null;
@@ -106,8 +155,10 @@ const reducer = (state = initalState, action) => {
         break;
       case ADD_POST_SUCCESS:
         // draft.mainPosts.unshift(dummyPost(action.data));
+        draft.mainPosts.unshift(action.data); // 실제 데이터로 넣어줌.
         draft.addPostLoading = false;
         draft.addPostDone = true;
+        draft.imagePaths = [];
         break;
       case ADD_POST_FAILRE:
         draft.addPostLoading = false;
@@ -138,6 +189,8 @@ const reducer = (state = initalState, action) => {
       case ADD_COMMENT_SUCCESS: {
         // const post = draft.mainPosts.find((v) => v.id === action.data.postId);
         // post.Comments.unshift(dummyComment(action.data.content));
+        const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
+        post.Comments.unshift(action.data);
         draft.addCommentLoading = false;
         draft.addCommentDone = true;
         break;

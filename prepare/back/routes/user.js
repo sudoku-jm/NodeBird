@@ -5,6 +5,38 @@ const {isLoggedIn, isNotLoggedIn} = require('./middlewares');
 const passport = require('passport');
 const router = express.Router();
 
+
+router.get('/', async (req, res,next) => {  //GET /user
+    try {
+        if(req.user){
+            const fullUserWithoutPassword = await User.findOne({
+                where : { id : req.user.id },
+                attributes : {
+                    exclude : ['password']
+                },
+                include : [{
+                    model : Post,
+                    attributes : ['id'],// 데이터 효율을 위해 id만 가져온다. (length)
+                },{
+                    model : User,
+                    as : 'Followings',
+                    attributes : ['id'],
+                },{
+                    model : User,
+                    as : 'Followers',
+                    attributes : ['id'],
+                }]
+            });
+            res.status(200).json(fullUserWithoutPassword); //사용자 있을 때만 보내기.
+        }else{
+            res.status(200).json(null);
+        }
+
+    } catch(error){
+        console.error(error);
+        return next(error);
+    }
+});
 //passport.authenticate의 내부 메커니즘을 통해서 LocalStrategy 이쪽으로 인증 처리 위임. local.js 전략을 실행시킨다.
 
 /*
@@ -15,6 +47,7 @@ const router = express.Router();
     예) return done(null, false, {reason : '비밀번호가 틀렸습니다.'});
     예) return done(error); 서버쪽 에러
 */
+
 
 //로그인
 router.post('/login', isNotLoggedIn, (req, res, next) => {//미들웨어 확장.
@@ -73,9 +106,10 @@ router.post('/logout', isLoggedIn, (req, res) => {
     // req.logout(() => {});
     // req.session.destroy(); //유저 정보 세션에서 삭제
     // res.status(200).send('ok');
-
+    console.log('logout?!');
     //passport 0.6버전
     req.logout((err) => {
+        req.logout(() => {});
 		req.session.destroy();
 		if (err) {
 			res.redirect("/");

@@ -2,13 +2,14 @@ const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
-const postRouter = require('./routes/post'); 
 const passport = require('passport');
 const dotenv = require('dotenv');
-
+const postRouter = require('./routes/post');  //게시글 1개만
+const postsRuter = require('./routes/posts'); //여러 게시글
 const userRouter = require('./routes/user'); 
 const db = require('./models'); // model > index.js 에서 등록된 db를 들고온다.
 const passportConfig = require('./passport'); //passport > index.js 등록
+const morgan = require('morgan');
 
 // env 파일 연결 들고오기
 dotenv.config();
@@ -24,9 +25,14 @@ db.sequelize.sync()
 //패스포트 연결
 passportConfig();
 
+app.use(morgan('dev')); //front -> back 요청 시 어디 api로 요청했는지 디버깅 용이.
+
+//credential true가 되어야 쿠키도 같이 전달이 된다.
 app.use(cors({
-  origin : '*',
-  // credentials : false, //추후 true로 변경.
+  // origin : '*',
+  // origin : true,
+  origin : 'http://localhost:3000',
+  credentials : true, 
 })); 
 app.use(express.json());
 app.use(express.urlencoded({extended : true}));
@@ -55,17 +61,18 @@ app.get('/api',(req, res) => {
   res.send('hello api');
 });
 
-app.get('/posts',(req, res) => {
-  //json 객체로 응답
-  res.json([
-    { id : 1, content: 'hello' },
-    { id : 2, content: 'hello' },
-    { id : 3, content: 'hello' },
-  ]);
-});
+// app.get('/posts',(req, res) => {
+//   //json 객체로 응답
+//   res.json([
+//     { id : 1, content: 'hello' },
+//     { id : 2, content: 'hello' },
+//     { id : 3, content: 'hello' },
+//   ]);
+// });
 
 //==================라우터 분리===========
 
+app.use('/posts',postsRuter); 
 //게시글 작성
 app.use('/post',postRouter); 
 

@@ -2,17 +2,14 @@ import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Card, Popover, Button, Avatar, Comment, List } from 'antd';
 import {
-  EllipsisOutlined,
-  HeartOutlined,
-  HeartTwoTone,
-  MessageOutlined,
-  RetweetOutlined,
+  EllipsisOutlined, HeartOutlined, HeartTwoTone,
+  MessageOutlined, RetweetOutlined,
 } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import PostImages from './PostImages';
 import CommentForm from './CommentForm';
 import PostCardContent from './PostCardContent';
-import { removePost } from '../reducers/post';
+import { LIKE_POST_REQUEST, removePost, UNLIKE_POST_REQUEST } from '../reducers/post';
 import FollowButton from './FollowButton';
 
 const PostCard = ({ post }) => {
@@ -20,15 +17,27 @@ const PostCard = ({ post }) => {
   const { removePostLoading } = useSelector((state) => state.post);
   // const id = useSelector((state) => state.user.me && state.user.me.id);
   const id = useSelector((state) => state.user.me?.id);
+  const liked = post.Likers.find((v) => v.id === id); // 게시글 좋아요 중 내가 있는가?
 
   // const { me } = useSelector((state) => state.user.me);
   // const id = me?.id; // me && me.id 와 같다. 옵셔널 체이닝 optional chaining.
 
   // 좋아요, 댓글 토글
-  const [liked, setLiked] = useState(false);
+  // const [liked, setLiked] = useState(false);
   const [commentFormOpended, setCommentFormOpended] = useState(false);
-  const onToggleLike = useCallback(() => {
-    setLiked((prev) => !prev);
+
+  const onLike = useCallback(() => {
+    dispatch({
+      type: LIKE_POST_REQUEST,
+      data: post.id
+    });
+  }, []);
+
+  const onUnlike = useCallback(() => {
+    dispatch({
+      type: UNLIKE_POST_REQUEST,
+      data: post.id
+    });
   }, []);
 
   const onToggleComment = useCallback(() => {
@@ -50,10 +59,10 @@ const PostCard = ({ post }) => {
             <HeartTwoTone
               twoToneColor="#eb2f96"
               key="heart"
-              onClick={onToggleLike}
+              onClick={onUnlike}
             />
           ) : (
-            <HeartOutlined key="heart" onClick={onToggleLike} />
+            <HeartOutlined key="heart" onClick={onLike} />
           ),
 
           <MessageOutlined key="comment" onClick={onToggleComment} />,
@@ -86,7 +95,8 @@ const PostCard = ({ post }) => {
           description={<PostCardContent postData={post.content} />}
         />
       </Card>
-      {commentFormOpended && (
+      {
+        commentFormOpended && (
         <div>
           <CommentForm post={post} />
           <List
@@ -104,7 +114,8 @@ const PostCard = ({ post }) => {
             )}
           />
         </div>
-      )}
+        )
+      }
     </div>
   );
 };
@@ -115,9 +126,10 @@ PostCard.propTypes = {
     id: PropTypes.string,
     User: PropTypes.object,
     content: PropTypes.string,
-    createdAt: PropTypes.object,
+    createdAt: PropTypes.string,
     Comments: PropTypes.arrayOf(PropTypes.object),
     Images: PropTypes.arrayOf(PropTypes.object),
+    Likers: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
 };
 

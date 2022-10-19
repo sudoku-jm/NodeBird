@@ -5,6 +5,7 @@ import userSaga from './user';
 
 export default function* rootSaga() {
   axios.defaults.baseURL = 'http://localhost:5500';
+  axios.defaults.withCredentials = true;
   yield all([
     fork(userSaga),
     fork(postSaga),

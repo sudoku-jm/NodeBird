@@ -4,14 +4,19 @@ import AppLayout from '../components/AppLayout';
 import PostForm from '../components/PostForm';
 import PostCard from '../components/PostCard';
 import { LOAD_POSTS_REQUEST } from '../reducers/post';
+import { LOAD_MY_INFO_REQUEST } from '../reducers/user';
 
 function Home() {
   const dispatch = useDispatch();
   const { logInDone } = useSelector((state) => state.user);
   const { mainPosts, hasMorePosts, loadPostsLoading } = useSelector((state) => state.post);
   useEffect(() => {
+    // 메인 접속 시 : 유저정보, 페이지 정보 불러옴
     dispatch({
-      type: LOAD_POSTS_REQUEST,
+      type: LOAD_MY_INFO_REQUEST, // 매번 로그인 중인 것을 복구하기 위해(새로고침)
+    });
+    dispatch({
+      type: LOAD_POSTS_REQUEST, // 페이지 정보 불러오기
     });
   }, []);
   useEffect(() => {
@@ -25,7 +30,7 @@ function Home() {
 
         scrollY + clientHeight = scrollHeight
       */
-      console.log(winSrcollY, clientH, documentScrollH);
+      // console.log(winSrcollY, clientH, documentScrollH);
       if (winSrcollY + clientH > documentScrollH) {
         if (hasMorePosts && !loadPostsLoading) {
           dispatch({

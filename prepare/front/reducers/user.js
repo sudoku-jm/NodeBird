@@ -1,6 +1,9 @@
 import produce from 'immer';
 
 export const initalState = {
+  loadUserLoading: false, // 유저 정보 가져오기 시도중
+  loadUserDone: false,
+  loadUserError: null,
   followLoading: false, // follow 시도중
   followDone: false,
   followError: null,
@@ -25,6 +28,10 @@ export const initalState = {
 };
 
 // 액션명은 변수로 빼준다. 다른 곳에서 불러다 쓸 수 있으니 export 시켜준다. saga에서도 사용된다. 액션만 사용되는 폴더를 따로 만들어서 분리시켜도 좋다.
+export const LOAD_MY_INFO_REQUEST = 'LOAD_MY_INFO_REQUEST';
+export const LOAD_MY_INFO_SUCCESS = 'LOAD_MY_INFO_SUCCESS';
+export const LOAD_MY_INFO_FAILRE = 'LOAD_MY_INFO_FAILRE';
+
 export const LOG_IN_REQUEST = 'LOG_IN_REQUEST';
 export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS';
 export const LOG_IN_FAILRE = 'LOG_IN_FAILRE';
@@ -53,47 +60,42 @@ export const CHANGE_NICKNAME_FAILRE = 'CHANGE_NICKNAME_FAILRE';
 export const ADD_POST_TO_ME = 'ADD_POST_TO_ME';
 export const REMOVE_POST_OF_ME = 'REMOVE_POST_OF_ME';
 
-const dummyUser = (data) => ({
-  ...data,
-  id: 1,
-  // email: data.email,
-  // password: data.password,
-  nickname: '미니미니',
-  Posts: [
-    { id: 1 },
-  ],
-  Followings: [
-    { nickname: '부기초' },
-    { nickname: 'minimini' },
-    { nickname: 'jm91' },
-  ],
-  Followers: [
-    { nickname: '부기초' },
-    { nickname: 'minimini' },
-    { nickname: 'jm91' },
-    { nickname: 'sudoku' },
-  ],
-});
+// const dummyUser = (data) => ({
+//   ...data,
+//   id: 1,
+//   // email: data.email,
+//   // password: data.password,
+//   nickname: '미니미니',
+//   Posts: [
+//     { id: 1 },
+//   ],
+//   Followings: [
+//     { nickname: '부기초' },
+//     { nickname: 'minimini' },
+//     { nickname: 'jm91' },
+//   ],
+//   Followers: [
+//     { nickname: '부기초' },
+//     { nickname: 'minimini' },
+//     { nickname: 'jm91' },
+//     { nickname: 'sudoku' },
+//   ],
+// });
 
 // 로그인 액션
-export const loginRequestAction = (email, password) => {
+export const loginRequestAction = (data) => {
   // data.email, data.password가 saga로 전달.
-  console.log('loginRequestAction data', email, password);
+  // console.log('loginRequestAction data', email, password);
   return {
     type: LOG_IN_REQUEST,
-    data: {
-      email,
-      password
-    }
+    data
   };
 };
 
 // 로그아웃 액션
-export const logoutRequestAction = () => {
-  return {
-    type: LOG_OUT_REQUEST,
-  };
-};
+export const logoutRequestAction = () => ({
+  type: LOG_OUT_REQUEST,
+});
 
 // 회원가입 액션
 // export const signUpRequestAction = (data) => {
@@ -108,6 +110,21 @@ const reducer = (state = initalState, action) => {
   return produce(state, (d) => {
     const draft = d;
     switch (action.type) {
+      //= ============== LOAD_MY_INFO 유저정보 유지
+      case LOAD_MY_INFO_REQUEST:
+        draft.loadUserLoading = true;
+        draft.loadUserError = null;
+        draft.loadUserDone = false;
+        break;
+      case LOAD_MY_INFO_SUCCESS:
+        draft.loadUserLoading = false;
+        draft.me = action.data;
+        draft.loadUserDone = true;
+        break;
+      case LOAD_MY_INFO_FAILRE:
+        draft.loadUserLoading = false;
+        draft.loadUserError = action.error;
+        break;
       //= ============== FOLLOW
       case FOLLOW_REQUEST:
         draft.followLoading = true;
