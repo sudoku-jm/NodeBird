@@ -3,9 +3,10 @@ const bcrypt = require('bcrypt');
 const { User, Post } = require('../models');
 const {isLoggedIn, isNotLoggedIn} = require('./middlewares');
 const passport = require('passport');
+const { route } = require('./post');
 const router = express.Router();
 
-
+//회원정보 불러오기
 router.get('/', async (req, res,next) => {  //GET /user
     try {
         if(req.user){
@@ -114,11 +115,12 @@ router.post('/logout', isLoggedIn, (req, res) => {
 		if (err) {
 			res.redirect("/");
 		} else {
-			res.status(200).send("server ok: 로그아웃 완료");
+			res.status(200).json("server ok: 로그아웃 완료");
 		}
 	});
 });
 
+// 회원가입
 router.post('/', isNotLoggedIn, async (req ,res, next) => {    //POST /user
     console.log('req',req.body);
     try{
@@ -156,5 +158,121 @@ router.post('/', isNotLoggedIn, async (req ,res, next) => {    //POST /user
     }
 
 });
+
+//회원정보 수정. 닉네임 수정
+router.patch('/nickname', isLoggedIn, async(res, req, next) => {    // PATCH /user/nickname
+    try{
+        //update
+        await User.update({
+            //변경할 정보
+            nickname : req.body.nickname,   //프론트에서 받은 닉네임을 가져오고,(바뀔 닉네임)
+        },{
+            //필터 : 조건 정확하게. 내 닉네임의 닉네임을 프론트에서 받은 닉네임으로 교체한다.
+            where : { id: req.user.id, }    //내 아이디로 본인 인증.
+        });
+        res.status(200).json({ nickname : req.body.nickname });
+
+    }catch(error){
+        console.error(error);
+        next(error);
+    }
+});
+
+
+//팔로우
+router.patch('/:userId/follow', isLoggedIn, async(res, req, next) => {      //PATCH /user/1/follow
+    try{
+        //팔로우 할 유저 존재 여부 확인
+        const user = await User.findOne({ where : {id : req.params.userId} });
+        if(!user){
+            res.status(403).send('없는 사람을 팔로우하려고 하시네요?');
+        }
+        await user.addFollowers(req.user.id);   
+        // 대다대관계 테이블
+        // follow테이블에 어떤 유저가(req.user.id)가 following 했는지(따랐는지) 테이블 추가.
+        /*
+            FollowingId     UserId
+            3               1           //1번 유저가 3번 유저를 팔로잉.(추가 addFollowers)
+        */
+        //update
+        res.status(200).json({ UserId : parseInt(req.params.userId , 10) });
+        
+    }catch(error){
+        console.error(error);
+        next(error);
+    }
+});
+
+//언팔로우(팔로우 취소)
+router.delete('/:userId/follow', isLoggedIn, async(res, req, next) => {     //DELETE /user/1/follow
+    try{
+        //언팔로우 할 유저 존재 여부 확인
+        const user = await User.findOne({ where : {id : req.params.userId} });
+        if(!user){
+            res.status(403).send('없는 사람을 언팔로우하려고 하시네요?');
+        }
+        await user.removeFollowers(req.user.id);   
+        res.status(200).json({ UserId : parseInt(req.params.userId , 10) });
+
+    }catch(error){
+        console.error(error);
+        next(error);
+    }
+});
+
+//팔로워 목록 불러오기
+router.get('/followers', isLoggedIn, async (req, res, next) => {       // GET /user/followers
+    try{
+        //사용자 먼저 찾기
+        const user = await User.findOne({ where : {id : req.user.id} });
+        if(!user){
+            res.status(403).send('없는 사람을 찾으려고 하시네요');
+        }
+        // 사용자의 팔로워 가져오기
+        const followers = await user.getFolloers();
+        res.status(200).json(followers);
+
+    }catch(error){
+        console.error(error);
+        next(error);
+    }
+});
+
+//팔로잉 목록 불러오기
+router.get('/followings', isLoggedIn, async (req, res, next) => {       // GET /user/followings
+    try{
+        //사용자 먼저 찾기
+        const user = await User.findOne({ where : {id : req.user.id} });
+        if(!user){
+            res.status(403).send('없는 사람을 찾으려고 하시네요');
+        }
+        // 사용자의 팔로잉 가져오기
+        const followings = await user.getFollowings();
+        res.status(200).json(followings);
+
+    }catch(error){
+        console.error(error);
+        next(error);
+    }
+});
+
+//팔로워 차단,제거
+router.delete('/follower/:userId', isLoggedIn, async (req, res, next) => {       // DELETE /user/follower/3
+    try{
+    //차단할 사람을 먼저 찾아, 그 사람의 목록에서 팔로잉을 끊는다.
+      const user = await User.findOne({ where : { id : req.params.userId} });
+      if(!user){
+        res.status(403).send('없는 사람을 차단하려고 하시네요.');
+      }
+      //차단 할 사용자 팔로워 목록에서 나를 제거
+      await user.removeFollowings(req.user.id);
+      res.status(200).json({ UserId : parseInt(req.params.userId, 10)});
+
+    }catch(error){
+        console.error(error);
+        next(error);
+    }
+});
+
 
 module.exports = router;

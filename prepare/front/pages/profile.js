@@ -1,12 +1,23 @@
 import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Router from 'next/router';
 import NicknameEditForm from '../components/NicknameEditForm';
 import AppLayout from '../components/AppLayout';
 import FollowList from '../components/FollowList';
+import { LOAD_FOLLOWERS_REQUEST, LOAD_FOLLOWINGS_REQUEST } from '../reducers/user';
 
 function Profile() {
+  const dispatch = useDispatch();
   const { me } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    dispatch({
+      type: LOAD_FOLLOWERS_REQUEST,
+    });
+    dispatch({
+      type: LOAD_FOLLOWINGS_REQUEST,
+    });
+  }, []);
 
   useEffect(() => {
     // 로그아웃 하는 경우

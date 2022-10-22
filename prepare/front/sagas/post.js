@@ -1,4 +1,4 @@
-import { all, delay, fork, put, takeLatest, throttle, call } from 'redux-saga/effects';
+import { all, fork, put, takeLatest, throttle, call } from 'redux-saga/effects';
 // import { nanoid } from 'nanoid';
 import axios from 'axios';
 import {
@@ -68,18 +68,19 @@ function* addPost(action) {
 }
 
 /* ==========removePost============ */
-// function removePostAPI(data) {
-//     return axios.delete('/api/post', data)
-// }
+function removePostAPI(data) {
+  return axios.delete(`/post/${data}`);
+}
 
 function* removePost(action) {
   try {
-    //    const result = yield call(addPostAPI, action.data) ;
-    yield delay(1000);
+    const result = yield call(removePostAPI, action.data);
+    // yield delay(1000);
+    console.log('removePostAPI result', result);
 
     yield put({
       type: REMOVE_POST_SUCCESS,
-      data: action.data
+      data: result.data
     });
     // saga에서는 user.js 리듀서에 접근 할 수 있다.
     yield put({

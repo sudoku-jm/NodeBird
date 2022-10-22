@@ -83,7 +83,7 @@ export const addPost = (data) => ({
 
 export const removePost = (data) => ({
   type: REMOVE_POST_REQUEST,
-  data,
+  data: data.post.id
 });
 
 export const addComment = (data) => ({
@@ -172,7 +172,7 @@ const reducer = (state = initalState, action) => {
         break;
       case REMOVE_POST_SUCCESS:
         // mainPosts: state.mainPosts.filter((v) => v.id !== action.data),
-        draft.mainPosts = draft.mainPosts.filter((v) => v.id !== action.data);
+        draft.mainPosts = draft.mainPosts.filter((v) => v.id !== action.data.PostId);
         draft.removePostLoading = false;
         draft.removePostDone = true;
         break;

@@ -59,7 +59,7 @@ router.post('/:postId/comment', isLoggedIn, async (req ,res, next) => {  //POST 
 
     const comment = await Post.create({
       content : req.body.content, // 데이터로 전달받은 부분 req.body...
-      PostId : parseInt(req.params.postId), // 파라미터로 전달받은 부분 req.params...
+      PostId : parseInt(req.params.postId, 10), // 파라미터로 전달받은 부분 req.params...
       UserId : req.user.id,
     });
 
@@ -128,9 +128,25 @@ router.delete('/:postId/like', isLoggedIn, async(req, res, next) => { //DELETE /
   }
 });
 
-router.delete('/',(req, res) => {
-  res.send('hello api');
+//post 삭제
+router.delete('/:postId', isLoggedIn, async (req, res, next) => {  //DELETE post/1
+  try{
+    //시퀄라이즈에서는 제거할 때 destroy로 삭제한다.
+    await Post.destroy({
+      where:{
+        id : req.params.postId,
+        UserId : req.user.id,   //본인이 작성한 게시글만 삭제할 수 있도록
+      }
+    });
+    
+    res.status(200).json({ PostId : parseInt(req.params.postId, 10) }); //문자가 아닌 숫자로 전달
+  
+  }catch(error){
+    console.error(error);
+    next(error);
+  }
 });
+
 
 
 module.exports = router;
