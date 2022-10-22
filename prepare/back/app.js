@@ -34,6 +34,8 @@ app.use(cors({
   origin : 'http://localhost:3000',
   credentials : true, 
 })); 
+
+//front -> back으로보낼 때 json과 url인코디드로만 받고있다. 멀티파트데이터를 받을 수 없다.
 app.use(express.json());
 app.use(express.urlencoded({extended : true}));
 

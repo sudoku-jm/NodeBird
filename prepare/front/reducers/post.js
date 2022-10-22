@@ -24,6 +24,9 @@ export const initalState = {
   addCommentLoading: false, // 코멘트 작성 시도
   addCommentDone: false,
   addCommentError: null,
+  uploadImagesLoading: false, // 이미지 업로드
+  uploadImagesDone: false,
+  uploadImagesError: null,
 };
 
 // export const generateDummyPost = (number) => Array(number).fill().map(() => ({
@@ -52,6 +55,10 @@ export const initalState = {
 // );
 
 // 액션 이름을 상수로 뺌. switch case에서 const값을 재활용 할 수 있다. 오탈자 방지 가능.
+export const UPLOAD_IMAGES_REQUEST = 'UPLOAD_IMAGES_REQUEST';
+export const UPLOAD_IMAGES_SUCCESS = 'UPLOAD_IMAGES_SUCCESS';
+export const UPLOAD_IMAGES_FAILRE = 'UPLOAD_IMAGES_FAILRE';
+
 export const LIKE_POST_REQUEST = 'LIKE_POST_REQUEST';
 export const LIKE_POST_SUCCESS = 'LIKE_POST_SUCCESS';
 export const LIKE_POST_FAILRE = 'LIKE_POST_FAILRE';
@@ -95,6 +102,22 @@ const reducer = (state = initalState, action) => {
   return produce(state, (d) => {
     const draft = d;
     switch (action.type) {
+      //= ============== UPLOAD IMAGES
+      case UPLOAD_IMAGES_REQUEST:
+        draft.uploadImagesLoading = true;
+        draft.uploadImagesError = null;
+        draft.uploadImagesDone = false;
+        break;
+      case UPLOAD_IMAGES_SUCCESS: {
+        draft.uploadImagesLoading = false;
+        draft.uploadImagesDone = true;
+        draft.me.imagePaths = action.data;
+        break;
+      }
+      case UPLOAD_IMAGES_FAILRE:
+        draft.uploadImagesLoading = false;
+        draft.uploadImagesError = action.error;
+        break;
       //= ============== UNLIKE POST
       case UNLIKE_POST_REQUEST:
         draft.unlikePostLoading = true;

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { Form, Input, Button } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { addPost } from '../reducers/post';
+import { addPost, UPLOAD_IMAGES_REQUEST } from '../reducers/post';
 import useInput from '../hooks/useInput';
 
 const PostForm = () => {
@@ -27,12 +27,28 @@ const PostForm = () => {
     imageInput.current.click();
   }, [imageInput.current]);
 
+  const onChangeImages = useCallback((e) => {
+    console.log('images', e.target.files);
+    const imageFormData = new FormData();
+    // 멀티파트 파일로 보내야 multer가 처리해준다.
+
+    // e.target.files가 배열인지 아닌지 모름, 유사배열이라 []로 씀
+    [].forEach.call(e.target.files, (f) => {
+      imageFormData.append('image', f);
+    });
+
+    dispatch({
+      type: UPLOAD_IMAGES_REQUEST,
+      data: imageFormData,
+    });
+  }, []);
+
   return (
     <Form style={{ margin: '10px 0 20px' }} encType="multipart/form-data" onFinish={onSubmit}>
       <Input.TextArea value={text} onChange={onChangeText} maxLength={140} placeholder="어떤 신기한 일이 있었나요?" />
       <div>
         {/* 이미지 업로드란 */}
-        <input type="file" multiple hidden ref={imageInput} />
+        <input type="file" name="image" multiple hidden ref={imageInput} onChange={onChangeImages} />
         <Button onClick={onClickImageUpload}>이미지 업로드</Button>
         <Button type="primary" loading={addPostLoading} htmlType="submit" style={{ float: 'right' }}>짹짹</Button>
       </div>

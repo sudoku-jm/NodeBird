@@ -1,7 +1,17 @@
 const express = require('express');
+const multer = require('multer');
+const path = require('path');
 const router = express.Router();
+const fs = require('fs'); //uploads라는 폴더를 만들어도 되지만 알아서 만들어주는 파일시스템 모듈.
 const {Post, Image, User, Hashtag, Comment} = require("../models");
 const {isLoggedIn} = require('./middlewares');
+
+try{
+  fs.accessSync('uploads');
+}catch(error){
+  console.log('uploads 폴더가 없으므로 생성합니다.');
+  fs.mkdirSync('uploads');
+}
 
 //post 작성
 router.post('/', isLoggedIn, async (req ,res, next) => {  // POST /post
@@ -40,6 +50,28 @@ router.post('/', isLoggedIn, async (req ,res, next) => {  // POST /post
     console.error(error);
     next(error);
   }
+});
+
+const upload = multer({
+  storage : multer.diskStorage({
+    destination(req, file, done){
+      done(null, 'uploads');  //uploads라는 폴더에 업로드.
+    },
+    filename(req, file, done){
+      //path 라는 모듈을 통해 파일 정보 추출.
+      const ext = path.extname(file.originalname);  //확장자 추출 (png)
+      const basename  = path.basename(file.originalname, ext);  //제로초.png
+      done(null, basename + new Date().getTime() + ext); //제로초125751634.png 
+    }
+  }),
+  //limits 파일 업로드 사이즈 제한
+  limits : {fileSize : 20 * 1024 * 1024}, //20MB
+});
+//이미지 업로드용 (멀티파트파일 처리)
+router.post('/images',isLoggedIn, upload.array('image'), async(req, res, next) => {    //POST  /post/images
+  //이미지 업로드 후 실행되는 부분
+  console.log(req.files);
+  res.json(req.files.map((v) => v.filename)); //어디로 업로드되었는지 프론트로 넘겨준다.
 });
 
 // post 코멘트 작성
