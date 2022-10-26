@@ -10,6 +10,7 @@ const userRouter = require('./routes/user');
 const db = require('./models'); // model > index.js 에서 등록된 db를 들고온다.
 const passportConfig = require('./passport'); //passport > index.js 등록
 const morgan = require('morgan');
+const path = require('path');
 
 // env 파일 연결 들고오기
 dotenv.config();
@@ -34,6 +35,16 @@ app.use(cors({
   origin : 'http://localhost:3000',
   credentials : true, 
 })); 
+
+//upload 폴더를 프론트에도 제공할 수 있도록 한다
+/*
+노드에서는 path.join() 를 쓴다.
+window에서는 / 를 쓰지만 MAC이나 리눅스에서는 \를 쓰는 경우가 있다.
+운영체제에 대한 차이점으로 인해 문제가 생길 수 있다. 이를 운영체제에 맞에 알아서 해준다.
+
+localhost:5500/
+*/
+app.use('/images', express.static(path.join(__dirname,'uploads')));
 
 //front -> back으로보낼 때 json과 url인코디드로만 받고있다. 멀티파트데이터를 받을 수 없다.
 app.use(express.json());

@@ -83,6 +83,9 @@ export const ADD_COMMENT_REQUEST = 'ADD_COMMENT_REQUEST';
 export const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS';
 export const ADD_COMMENT_FAILRE = 'ADD_COMMENT_FAILRE';
 
+// 동기액션
+export const REMOVE_IMAGE = 'REMOVE_IMAGE';
+
 export const addPost = (data) => ({
   type: ADD_POST_REQUEST,
   data,
@@ -102,6 +105,10 @@ const reducer = (state = initalState, action) => {
   return produce(state, (d) => {
     const draft = d;
     switch (action.type) {
+      case REMOVE_IMAGE:
+      // 동기 액션(서버에서 업로드 된 이미지 들고 있으며, 프론트에서만 지움)
+        draft.imagePaths = draft.imagePaths.filter((v, i) => i !== action.data);
+        break;
       //= ============== UPLOAD IMAGES
       case UPLOAD_IMAGES_REQUEST:
         draft.uploadImagesLoading = true;
@@ -181,7 +188,7 @@ const reducer = (state = initalState, action) => {
         draft.mainPosts.unshift(action.data); // 실제 데이터로 넣어줌.
         draft.addPostLoading = false;
         draft.addPostDone = true;
-        draft.imagePaths = [];
+        draft.imagePaths = []; // 이미지 path 초기화
         break;
       case ADD_POST_FAILRE:
         draft.addPostLoading = false;

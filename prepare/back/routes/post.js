@@ -13,8 +13,24 @@ try{
   fs.mkdirSync('uploads');
 }
 
+const upload = multer({
+  storage : multer.diskStorage({
+    destination(req, file, done){
+      done(null, 'uploads');  //uploads라는 폴더에 업로드.
+    },
+    filename(req, file, done){
+      //path 라는 모듈을 통해 파일 정보 추출.
+      const ext = path.extname(file.originalname);  //확장자 추출 (png)
+      const basename  = path.basename(file.originalname, ext);  //제로초.png
+      done(null, basename + '_' + new Date().getTime() + ext); //제로초_125751634.png 
+    }
+  }),
+  //limits 파일 업로드 사이즈 제한
+  limits : {fileSize : 20 * 1024 * 1024}, //20MB
+});
+
 //post 작성
-router.post('/', isLoggedIn, async (req ,res, next) => {  // POST /post
+router.post('/', isLoggedIn, upload.none(), async (req ,res, next) => {  // POST /post
   // res.json('작성완료');
   // res.json({id : 1, content:'hello'});  //작성된 게시글
   
@@ -23,6 +39,21 @@ router.post('/', isLoggedIn, async (req ,res, next) => {  // POST /post
       content : req.body.content,
       UserId: req.user.id, //로그인 시 라우터에 serializeUser를 통해 user.id를 들고 있다.(passport참고) 그래서 req.user에 접근이 가능하다.
     });
+
+    if(req.body.image){
+      if(Array.isArray(req.body.image)){  //이미지를 여러 개 올리면 image : [제로초.png, 부기초.png]
+        // Promise.all을 여러개를 병렬로 비동기 함수 실행.
+        // await Promise.all([display(3000), display(2000), display(1000)])
+        const images = await Promise.all(req.body.image.map((image) => Image.create({src : image}))); //시퀄라이즈로 올려준다. DB에는 파일 주소만 올려놓음.
+        await post.addImages(images);   //const post 만들어 놓은곳에 추가 된다.
+      }else{ // 이미지를 하나만 올리면 image : 제로초.png
+          const image = await Image.create({src : req.body.image });
+          await post.addImages(image);
+          /*
+            create 시 id를 직접 넣은 경우는 addX...를 안해도 되는데, id를 안 넣은 경우는 addX...를 해야 된다.그래야 연결 됨. 댓글 comment에서는 postId를 직접 넣음.
+          */
+      }
+    }
 
     const fullPost = await Post.findOne({
       where : { id : post.id },
@@ -52,21 +83,7 @@ router.post('/', isLoggedIn, async (req ,res, next) => {  // POST /post
   }
 });
 
-const upload = multer({
-  storage : multer.diskStorage({
-    destination(req, file, done){
-      done(null, 'uploads');  //uploads라는 폴더에 업로드.
-    },
-    filename(req, file, done){
-      //path 라는 모듈을 통해 파일 정보 추출.
-      const ext = path.extname(file.originalname);  //확장자 추출 (png)
-      const basename  = path.basename(file.originalname, ext);  //제로초.png
-      done(null, basename + new Date().getTime() + ext); //제로초125751634.png 
-    }
-  }),
-  //limits 파일 업로드 사이즈 제한
-  limits : {fileSize : 20 * 1024 * 1024}, //20MB
-});
+
 //이미지 업로드용 (멀티파트파일 처리)
 router.post('/images',isLoggedIn, upload.array('image'), async(req, res, next) => {    //POST  /post/images
   //이미지 업로드 후 실행되는 부분

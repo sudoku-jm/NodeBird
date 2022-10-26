@@ -19,7 +19,7 @@ function PostImages({ images }) {
   if (images.length === 1) {
     return (
       <>
-        <img role="presentation" style={styleImgViewFull} src={images[0].src} alt={images[0].src} onClick={onZoom} />
+        <img role="presentation" style={styleImgViewFull} src={`http://localhost:5500/images/${images[0].src}`} alt={images[0].src} onClick={onZoom} />
         {showImagesZoom && <ImagesZoom images={images} onClose={onClose} />}
       </>
     );
@@ -27,8 +27,8 @@ function PostImages({ images }) {
   if (images.length === 2) {
     return (
       <>
-        <img role="presentation" style={styleImgViewHalf} src={images[0].src} alt={images[0].src} onClick={onZoom} />
-        <img role="presentation" style={styleImgViewHalf} src={images[1].src} alt={images[1].src} onClick={onZoom} />
+        <img role="presentation" style={styleImgViewHalf} src={`http://localhost:5500/images/${images[0].src}`} alt={images[0].src} onClick={onZoom} />
+        <img role="presentation" style={styleImgViewHalf} src={`http://localhost:5500/images/${images[1].src}`} alt={images[1].src} onClick={onZoom} />
         {showImagesZoom && <ImagesZoom images={images} onClose={onClose} />}
       </>
     );
@@ -36,7 +36,7 @@ function PostImages({ images }) {
 
   return (
     <div>
-      <img role="presentation" style={styleImgViewHalf} src={images[0].src} alt={images[0].src} onClick={onZoom} />
+      <img role="presentation" style={styleImgViewHalf} src={`http://localhost:5500/images/${images[0].src}`} alt={images[0].src} onClick={onZoom} />
       <div
         role="presentation"
         style={styleImgWrap}
