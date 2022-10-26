@@ -13,6 +13,7 @@ try{
   fs.mkdirSync('uploads');
 }
 
+//upload multer
 const upload = multer({
   storage : multer.diskStorage({
     destination(req, file, done){
@@ -29,17 +30,33 @@ const upload = multer({
   limits : {fileSize : 20 * 1024 * 1024}, //20MB
 });
 
+
 //post 작성
 router.post('/', isLoggedIn, upload.none(), async (req ,res, next) => {  // POST /post
-  // res.json('작성완료');
-  // res.json({id : 1, content:'hello'});  //작성된 게시글
-  
   try{
+    const hashtags = req.body.content.match(/#[^\s#]+/g);  //해시태그 찾는 정규표현식
     const post = await Post.create({
       content : req.body.content,
       UserId: req.user.id, //로그인 시 라우터에 serializeUser를 통해 user.id를 들고 있다.(passport참고) 그래서 req.user에 접근이 가능하다.
     });
 
+    if(hashtags){
+      //Hashtag 테이블에 내용 추가. 검색되는건 똑같이 하기 위해 소문자로 저장.
+      const result = await Promise.all( 
+        hashtags.map((tag) => 
+          // Hashtag.create({ name : tag.slice(1).toLowerCase() }) 이렇게 저장하면 중복저장된다.
+          Hashtag.findOrCreate(
+            { where : { name : tag.slice(1).toLowerCase() } }
+          )   //중복안하고 저장
+          //findOrCreate : where로 검색 후 저장. 없을때만 등록 있으면 가져옴.
+        )
+      );
+      
+      // [ [#노드, true], [#리액트, true] ]  findOrCreate모양이 이런식으로 저장되므로 아래와 같이 addHashtags해준다. 배열에서 0번째것만 저장.
+      await post.addHashtags(result.map((v) => v[0]));
+    }
+
+    //이미지 추가
     if(req.body.image){
       if(Array.isArray(req.body.image)){  //이미지를 여러 개 올리면 image : [제로초.png, 부기초.png]
         // Promise.all을 여러개를 병렬로 비동기 함수 실행.

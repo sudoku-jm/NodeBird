@@ -42,7 +42,7 @@ app.use(cors({
 window에서는 / 를 쓰지만 MAC이나 리눅스에서는 \를 쓰는 경우가 있다.
 운영체제에 대한 차이점으로 인해 문제가 생길 수 있다. 이를 운영체제에 맞에 알아서 해준다.
 
-localhost:5500/
+localhost:5500/images
 */
 app.use('/images', express.static(path.join(__dirname,'uploads')));
 
