@@ -214,5 +214,80 @@ router.delete('/:postId', isLoggedIn, async (req, res, next) => {  //DELETE post
 });
 
 
+// post 리트윗
+router.post('/:postId/retweet', isLoggedIn, async (req ,res, next) => {  //POST /post/postID/retweet
+
+  try{
+    const post = await Post.findOne({
+      where : {id : req.params.postId},
+      include : [{
+        model : Post,
+        as : 'Retweet',
+      }],
+    });
+
+    if( !post ) {
+      return res.status(403).send('존재하지 않는 게시글입니다.');
+    }
+    //자기 게시글 리트윗 하거나, 남이 리트윗한 게시글을 다시 자기가 리트윗한 경우
+    if(req.user.id === post.UserId || (post.Retweet && post.Retweet.UserId === req.user.id)){
+      return res.status(403).send('자신의 글은 리트윗 할 수 없습니다.');
+    }
+
+    const retweetTargetId = post.Retweet || post.id; //남이 리트윗 한 게시글이거나 리트윗 없는 게시글(null)
+    const exPost = await Post.findOne({
+      where : {
+        UserId : req.user.id,
+        RetweetId : retweetTargetId,
+      }
+    });
+    //내가 리트윗 했던 게시글 막기
+    if(exPost){
+      return res.status(403).send('이미 리트윗했습니다.');
+    }
+
+    const retweet = await Post.create({
+      UserId : req.user.id,
+      RetweetId : retweetTargetId,
+      content : 'retweet',
+    });
+
+    //내가 어떤 글을 리트윗 했는지 알 수 있게.
+    const retweetWithPrevPost = await Post.findOne({
+      where : { id : retweet.id },  //리트윗 포스트 아이디.
+      //해당 게시글이 가지고 있는 데이터들을 프론트로 전달.
+      idclude : [{
+        model : Post,
+        as : 'Retweet',
+        include : [{
+          model : User,
+          attributes : ['id','nickname'],
+        },{
+          model : Image,
+        }]  //리트윗 게시글의 작성자와 이미지
+      },{
+        model : User,
+        attributes : ['id','nickname'],
+      },{
+        model : Image,
+      },{
+        model : Comment,
+        include : [{
+          model : User,
+          attributes : ['id','nickname'],
+        }]
+      },{
+        model : User,
+        as : 'Likers',
+        attributes : ['id'],
+      }]
+    });
+    res.status(201).json(retweetWithPrevPost); //다시 프론트로 json형태로 돌려줌.
+
+  }catch(error){
+    console.error(error);
+    next(error);
+  }
+});
 
 module.exports = router;

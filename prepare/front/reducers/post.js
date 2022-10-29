@@ -27,6 +27,10 @@ export const initalState = {
   uploadImagesLoading: false, // 이미지 업로드
   uploadImagesDone: false,
   uploadImagesError: null,
+  retweetLoading: false, // 리트윗 시도
+  retweetDone: false,
+  retweetError: null,
+
 };
 
 // export const generateDummyPost = (number) => Array(number).fill().map(() => ({
@@ -83,6 +87,10 @@ export const ADD_COMMENT_REQUEST = 'ADD_COMMENT_REQUEST';
 export const ADD_COMMENT_SUCCESS = 'ADD_COMMENT_SUCCESS';
 export const ADD_COMMENT_FAILRE = 'ADD_COMMENT_FAILRE';
 
+export const RETWEET_REQUEST = 'RETWEET_REQUEST';
+export const RETWEET_SUCCESS = 'RETWEET_SUCCESS';
+export const RETWEET_FAILRE = 'RETWEET_FAILRE';
+
 // 동기액션
 export const REMOVE_IMAGE = 'REMOVE_IMAGE';
 
@@ -108,6 +116,21 @@ const reducer = (state = initalState, action) => {
       case REMOVE_IMAGE:
       // 동기 액션(서버에서 업로드 된 이미지 들고 있으며, 프론트에서만 지움)
         draft.imagePaths = draft.imagePaths.filter((v, i) => i !== action.data);
+        break;
+      //= ============== RETWEET 리트윗
+      case RETWEET_REQUEST:
+        draft.retweetLoading = true;
+        draft.retweetError = null;
+        draft.retweetDone = false;
+        break;
+      case RETWEET_SUCCESS: {
+        draft.retweetLoading = false;
+        draft.retweetDone = true;
+        break;
+      }
+      case RETWEET_FAILRE:
+        draft.retweetLoading = false;
+        draft.retweetError = action.error;
         break;
       //= ============== UPLOAD IMAGES
       case UPLOAD_IMAGES_REQUEST:

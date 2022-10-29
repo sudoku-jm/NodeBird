@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import PostImages from './PostImages';
 import CommentForm from './CommentForm';
 import PostCardContent from './PostCardContent';
-import { LIKE_POST_REQUEST, removePost, UNLIKE_POST_REQUEST } from '../reducers/post';
+import { LIKE_POST_REQUEST, removePost, UNLIKE_POST_REQUEST, RETWEET_REQUEST } from '../reducers/post';
 import FollowButton from './FollowButton';
 
 const PostCard = ({ post }) => {
@@ -27,33 +27,56 @@ const PostCard = ({ post }) => {
   const [commentFormOpended, setCommentFormOpended] = useState(false);
 
   const onLike = useCallback(() => {
-    dispatch({
+    if (!id) {
+      return alert('로그인이 필요합니다.');
+    }
+    return dispatch({
       type: LIKE_POST_REQUEST,
       data: post.id
     });
-  }, []);
+  }, [id]);
 
   const onUnlike = useCallback(() => {
-    dispatch({
+    if (!id) {
+      return alert('로그인이 필요합니다.');
+    }
+    return dispatch({
       type: UNLIKE_POST_REQUEST,
       data: post.id
     });
-  }, []);
+  }, [id]);
 
   const onToggleComment = useCallback(() => {
+    if (!id) {
+      return alert('로그인이 필요합니다.');
+    }
     setCommentFormOpended((prev) => !prev);
-  }, []);
+  }, [id]);
 
   const onRemovePost = useCallback(() => {
-    dispatch(removePost(post.id));
-  }, []);
+    if (!id) {
+      return alert('로그인이 필요합니다.');
+    }
+    return dispatch(removePost(post.id));
+  }, [id]);
+
+  const onRetweet = useCallback(() => {
+    if (!id) {
+      return alert('로그인이 필요합니다.');
+    }
+
+    return dispatch({
+      type: RETWEET_REQUEST,
+      data: post.id
+    });
+  }, [id]);
 
   return (
     <div style={{ marginBottom: 10 }}>
       <Card
         cover={post.Images[0] && <PostImages images={post.Images} />}
         actions={[
-          <RetweetOutlined key="retweet" />,
+          <RetweetOutlined key="retweet" onClick={onRetweet} />,
 
           liked ? (
             <HeartTwoTone
