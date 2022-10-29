@@ -117,6 +117,7 @@ module.exports = {
       "jsx-a11y/click-events-have-key-events" : "off",
       "eslint no-use-before-define" : "off",
       "default-param-last": "off"
+      "max-len" : "off"
     }
   }
   /*

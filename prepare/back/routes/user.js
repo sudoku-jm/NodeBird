@@ -1,9 +1,8 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const passport = require('passport');
 const { User, Post } = require('../models');
 const {isLoggedIn, isNotLoggedIn} = require('./middlewares');
-const passport = require('passport');
-const { route } = require('./post');
 const router = express.Router();
 
 //회원정보 불러오기
@@ -63,11 +62,11 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {//미들웨어 확장.
             return res.status(401).send(info.reason);
         }
 
-        return req.login(user, async(loginerr) => {
+        return req.login(user, async(loginErr) => {
             //패스포트쪽 로그인
-            if(loginerr){
-                console.error(loginerr);
-                return next(loginerr);
+            if(loginErr){
+                console.error(loginErr);
+                return next(loginErr);
             }
 
             //로그인 성공
@@ -95,6 +94,8 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {//미들웨어 확장.
                     as : 'Followers'
                 }]
             });
+
+            //res.setHeader('Cookie','쿠키값');
             return res.status(200).json(fullUserWithoutPassword);
         })
     })(req, res, next);
@@ -144,10 +145,10 @@ router.post('/', isNotLoggedIn, async (req ,res, next) => {    //POST /user
         });
     
         // res.setHeader('Access-Control-Allow-Origin', '*'); 
-        // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000'); 
+        // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3060'); 
         /* 
         * : 모든 주소 허용.
-        http://localhost:3000 : 3000포트(브라우저)에서 오는 것은 모두 허용하겠다.
+        http://localhost:3060 : 3060(브라우저)에서 오는 것은 모두 허용하겠다.
 
         차단은 브라우저가 차단하지만 서버에서 허용해야한다.
         */

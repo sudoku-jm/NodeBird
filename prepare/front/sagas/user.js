@@ -15,7 +15,7 @@ import {
 
 /* ==========유저로그인 유지============ */
 function loadUserAPI() {
-  return axios.get('/user'); // 3000에 요청
+  return axios.get('/user'); // 3060 요청
 }
 
 function* loadUser(action) {

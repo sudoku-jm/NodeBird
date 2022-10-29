@@ -40,8 +40,16 @@ function* retweet(action) {
 }
 
 /* ==========loadPosts============ */
-function loadPostsAPI(data) {
-  return axios.get('/posts', data);
+function loadPostsAPI(lastId) {
+  /*
+    get에서 데이터를 넣는 방법(쿼리스트링) : 주소에 데이터가 다 포함되어있다.
+    ?키=값
+    &로 다음 키=값 구분.
+    예) /posts?lastId=${lastId}&limit=10&offset=10
+
+    lastId가 undefined인 경우 0으로 불러온다.
+  */
+  return axios.get(`/posts?lastId=${lastId || 0}`);
 }
 
 function* loadPosts(action) {
@@ -67,7 +75,7 @@ function* loadPosts(action) {
 function addPostAPI(data) {
   // return axios.post('/post', { content: data });
   // formData는 바로 data를 전송. {} 객체로 감싸지 않음
-  return axios.post('/post', data);
+  return axios.post('/post', data, { credentials: 'include' });
 }
 
 function* addPost(action) {

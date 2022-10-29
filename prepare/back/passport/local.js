@@ -1,5 +1,5 @@
 const passport = require('passport');
-const {Strategy : LocalStrategy} = require('passport-local'); //LocalStrategy로 이름 변경하여 사용.
+const { Strategy : LocalStrategy } = require('passport-local'); //LocalStrategy로 이름 변경하여 사용.
 const bcrypt = require('bcrypt');
 const {User} = require('../models'); //데이터 베이스 만들었던 시퀄라이즈 재사용
 

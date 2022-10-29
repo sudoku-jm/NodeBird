@@ -4,13 +4,14 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const dotenv = require('dotenv');
+const morgan = require('morgan');
+const path = require('path');
+
 const postRouter = require('./routes/post');  //게시글 1개만
 const postsRuter = require('./routes/posts'); //여러 게시글
 const userRouter = require('./routes/user'); 
 const db = require('./models'); // model > index.js 에서 등록된 db를 들고온다.
 const passportConfig = require('./passport'); //passport > index.js 등록
-const morgan = require('morgan');
-const path = require('path');
 
 // env 파일 연결 들고오기
 dotenv.config();
@@ -29,12 +30,13 @@ passportConfig();
 app.use(morgan('dev')); //front -> back 요청 시 어디 api로 요청했는지 디버깅 용이.
 
 //credential true가 되어야 쿠키도 같이 전달이 된다.
+// origin : '*',
+// origin : true,
 app.use(cors({
-  // origin : '*',
-  // origin : true,
-  origin : 'http://localhost:3000',
+  origin : 'http://localhost:3060',
   credentials : true, 
 })); 
+
 
 //upload 폴더를 프론트에도 제공할 수 있도록 한다
 /*
@@ -53,16 +55,16 @@ app.use(express.urlencoded({extended : true}));
 /* ====미들웨어 추가==== */
 
 //쿠키
-app.use(cookieParser(process.env.COKKIE_SECRET));
+app.use(cookieParser(process.env.COOKIE_SECRET));
 
 //세션
-app.use(session({
-  saveUninitialized : false,
-  resave : false,
-  secret : process.env.COKKIE_SECRET
-}));
-app.use(passport.initialize());
 app.use(session());
+app.use(passport.initialize());
+app.use(session({
+  saveUninitialized: false,
+  resave: false,
+  secret: process.env.COOKIE_SECRET,
+}));
 
 
 
@@ -70,9 +72,6 @@ app.get('/',(req, res) => {
   res.send('hello express');
 });
 
-app.get('/api',(req, res) => {
-  res.send('hello api');
-});
 
 // app.get('/posts',(req, res) => {
 //   //json 객체로 응답
@@ -93,9 +92,9 @@ app.use('/post',postRouter);
 app.use('/user',userRouter); 
 
 //에러처리 미들웨어는 마지막으로 들어감. 직접 작성해줄 수 있다.
-app.use((err, req, res, next) => {
+// app.use((err, req, res, next) => {
 
-});
+// });
 
 app.listen(5500, () => {
   console.log('서버 실행 중~!~!~!');

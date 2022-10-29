@@ -32,7 +32,7 @@ const upload = multer({
 
 
 //post 작성
-router.post('/', isLoggedIn, upload.none(), async (req ,res, next) => {  // POST /post
+router.post('/', isLoggedIn, upload.none(), async (req, res, next) => { // POST /post
   try{
     const hashtags = req.body.content.match(/#[^\s#]+/g);  //해시태그 찾는 정규표현식
     const post = await Post.create({
@@ -271,7 +271,7 @@ router.post('/:postId/retweet', isLoggedIn, async (req ,res, next) => {  //POST 
       },{
         model : Image,
       },{
-        model : Comment,
+        model : Comment,  //댓글을 따로들고온다던가 하는 라우터를 따로 만들어줘도 좋다.(속도 성능 측면)
         include : [{
           model : User,
           attributes : ['id','nickname'],

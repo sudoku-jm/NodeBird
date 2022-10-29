@@ -9,7 +9,14 @@ import { LOAD_MY_INFO_REQUEST } from '../reducers/user';
 function Home() {
   const dispatch = useDispatch();
   const { logInDone } = useSelector((state) => state.user);
-  const { mainPosts, hasMorePosts, loadPostsLoading } = useSelector((state) => state.post);
+  const { mainPosts, hasMorePosts, loadPostsLoading, retweetError } = useSelector((state) => state.post);
+  // 리트윗 에러 경고창
+  useEffect(() => {
+    console.log('rerender');
+    if (retweetError) {
+      alert(retweetError);
+    }
+  }, [retweetError]);
   useEffect(() => {
     // 메인 접속 시 : 유저정보, 페이지 정보 불러옴
     dispatch({
@@ -33,8 +40,11 @@ function Home() {
       // console.log(winSrcollY, clientH, documentScrollH);
       if (winSrcollY + clientH > documentScrollH) {
         if (hasMorePosts && !loadPostsLoading) {
+          const lastId = mainPosts[mainPosts.length - 1]?.id; // 총 게시글 수 - 1 = 라스트 아이디
+          // 게시글이 없는경우 undefind에러가 날 수 있음.
           dispatch({
             type: LOAD_POSTS_REQUEST, // 새로운 것
+            lastId,
           });
         }
       }
@@ -43,7 +53,7 @@ function Home() {
     return () => {
       window.removeEventListener('scroll', onScroll);
     };
-  }, [hasMorePosts]);
+  }, [hasMorePosts, loadPostsLoading, mainPosts]);
 
   return (
     <AppLayout>
